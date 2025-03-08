@@ -1,0 +1,111 @@
+/* ===== THEME ANIMATIONS =====
+ * Animations pour les transitions de thème
+ */
+
+/* Animation douce pour les changements de thème */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Effet d'échelle sur le switch au survol */
+.theme-switch:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}/*------------------------------------------------------
+ * theme-switcher.css
+ * 
+ * Contient les styles pour le sélecteur de thème clair/sombre
+ * utilisé dans le pied de page de l'application
+ *------------------------------------------------------*/
+
+/* ===== THEME SWITCH COMPONENT =====
+ * Styles pour le sélecteur de thème clair/sombre
+ */
+ .theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Espacement égal entre les éléments */
+    margin: 0;
+}
+
+/* Conteneur du switch */
+.theme-switch {
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    width: 44px;
+}
+
+/* Cache la checkbox native */
+.theme-switch input {
+    display: none;
+}
+
+/* Style du slider (partie visible du switch) */
+.slider {
+    background-color: rgba(255, 255, 255, 0.3); /* Meilleur contraste sur fond bleu */
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 24px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3); /* Ombre subtile pour plus de contraste */
+}
+
+/* Bouton/cercle du slider */
+.slider:before {
+    background-color: white;
+    bottom: 4px;
+    content: "";
+    height: 16px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 16px;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); /* Ombre pour donner du relief */
+}
+
+/* Style quand le thème sombre est actif */
+input:checked + .slider {
+    background-color: var(--color-button-alt);
+}
+
+/* Déplacement du cercle quand actif */
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* Style pour l'icône du thème */
+.theme-icon {
+    margin-left: var(--spacing-sm);
+    font-size: 1.2rem;
+    color: var(--color-bg-1);
+}
+
+/* Structure flexible du footer */
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-left {
+    flex: 1;
+}
+
+.footer-center {
+    flex: 2;
+    text-align: center;
+    margin: 0;
+}
+
+.footer-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: var(--spacing-md);
+}

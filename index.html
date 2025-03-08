@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard d'accès aux applications d'entreprise">
+    <title>Dashboard Entreprise</title>
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    
+    <!-- Styles CSS de l'application -->
+    <link rel="stylesheet" href="./styles/variables.css">
+    <link rel="stylesheet" href="./styles/base.css">
+    <link rel="stylesheet" href="./styles/components.css">
+    <link rel="stylesheet" href="./styles/theme-switcher.css">
+    <link rel="stylesheet" href="./styles/responsive.css">
+    <link rel="stylesheet" href="./styles/dock.css">
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- En-tête de l'application -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-th"></i>
+                    <span>Dashboard Entreprise</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dock d'accès rapide -->
+    <div class="quick-dock" id="quickDock">
+        <div class="dock-container">
+            <div class="dock-toggle" id="dockToggle">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="dock-title">Sections</div>
+            <div class="dock-apps" id="dockApps">
+                <!-- Rempli dynamiquement par JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Corps principal de l'application -->
+    <main>
+        <div class="container">
+            <!-- Section d'alerte/notification -->
+            <div class="alert-section">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">En cours de dévelopement</div>
+                    <div class="alert-description">Cette application est actuellement en cours de développement. Veuillez nous excuser pour les inconvenients causés.</div>
+                </div>
+            </div>
+            
+            <!-- Sections de catégories -->
+            <div id="categoriesContainer">
+                <!-- Rempli dynamiquement par JavaScript -->
+            </div>
+        </div>
+    </main>
+    
+    <!-- Pied de page -->
+    <footer>
+        <div class="container footer-container">
+            <div class="footer-left"></div>
+            <p class="footer-center">Dashboard Entreprise &copy; 2025 - Eyraud Mathieu</p>
+            <div id="themeToggleContainer" class="footer-right">
+                <!-- Le ThemeManager va insérer le switch du mode sombre ici -->
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript de l'application -->
+    <!-- Data -->
+    <script src="./js/data/opti.js"></script>
+    <script src="./js/data/secuopti.js"></script>
+    <script src="./js/data/opc.js"></script>
+    <script src="./js/data/gestion.js"></script>
+    <script src="./js/data/correcteur.js"></script>
+    <script src="./js/data/goal.js"></script>
+    <script src="./js/data/outils.js"></script>
+    <script src="./js/data/categories.js"></script>
+    
+    <!-- Core -->
+    <script src="./js/config.js"></script>
+    <script src="./js/services/StorageService.js"></script>
+    <script src="./js/controllers/AppController.js"></script>
+    <script src="./js/models/CategoryModel.js"></script>
+    <script src="./js/models/FavoritesModel.js"></script>
+    <script src="./js/models/DockStateModel.js"></script>
+    <script src="./js/ui/ThemeManager.js"></script>
+    <script src="./js/ui/UIManager.js"></script>
+    <script src="./js/ui/DockManager.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>

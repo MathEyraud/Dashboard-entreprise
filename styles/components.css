@@ -1,0 +1,224 @@
+/* components.css - Styles pour les composants spécifiques du dashboard */
+
+/* Section de catégorie */
+.category-section {
+    margin-bottom: var(--category-spacing);
+    padding: var(--spacing-md);
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--card-border);
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.category-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-xl);
+    color: var(--color-active);
+    transition: color 0.3s ease;
+}
+
+.category-title i {
+    font-size: 1.25rem;
+}
+
+.dark-mode .category-title {
+    color: var(--color-button-alt);
+}
+
+.category-link {
+    font-size: var(--font-size-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+/* Grille d'applications */
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--app-tile-size), 1fr));
+    gap: var(--app-tile-gap);
+    margin-top: var(--spacing-md);
+}
+
+/* Tuile d'application (style téléphone) */
+.app-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-md);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    border: 1px solid var(--card-border);  /* Ajout d'une bordure subtile */
+}
+
+.app-tile:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-button);  /* Bordure plus visible au survol */
+}
+
+.app-tile:active {
+    transform: translateY(0);
+}
+
+/* Icône d'application */
+.app-icon {
+    width: var(--app-icon-size);
+    height: var(--app-icon-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-sm);
+    font-size: 24px;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.app-icon i {
+    font-size: 24px;
+}
+
+/* Nom d'application */
+.app-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    color: var(--text-light);
+    transition: color 0.3s ease;
+    line-height: 1.2;
+    margin-top: var(--spacing-xs);
+}
+
+/* Badge/notification */
+.app-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: var(--color-error);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+}
+
+/* Section d'alerte (notification) */
+.alert-section {
+    background-color: var(--color-warning-light);
+    color: var(--color-warning);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode .alert-section {
+    background-color: rgba(219, 114, 0, 0.2);
+}
+
+.alert-icon {
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-xs);
+}
+
+.alert-description {
+    font-size: var(--font-size-sm);
+}
+
+/* Thème sombre pour les sections */
+.dark-mode .category-section {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+/* Thème sombre pour le menu de navigation */
+.dark-mode .category-nav {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+.dark-mode .category-nav-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+}
+
+.dark-mode .category-nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Thème sombre pour les tuiles */
+.dark-mode .app-tile {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+.dark-mode .app-tile:hover {
+    border-color: var(--color-button-alt);
+}
+
+.dark-mode .app-name {
+    color: var(--text-light);
+}
+
+.category-nav-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--gray-200);
+    color: var(--color-interactive);
+    border-radius: var(--border-radius-xl);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-weight: var(--font-weight-semibold);
+}
+
+.category-nav-item:hover {
+    background-color: var(--gray-300);
+}
+
+.category-nav-item.active {
+    background-color: var(--color-active);
+    color: white;
+}
+
+.dark-mode .category-nav-item.active {
+    background-color: var(--color-button-alt);
+}

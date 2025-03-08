@@ -1,0 +1,147 @@
+/* Import de la police Source Sans Pro */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap');
+
+:root {
+    /* Couleurs - Fond Clair (Light Mode) - Identiques à Vendredi */
+    --color-active: #164194;
+    --color-dynamic: #E1051E;
+    --color-interactive: #0E2C49;
+    --color-informative: rgba(14, 44, 73, 0.7);
+    --color-inactive: rgba(14, 44, 73, 0.15);
+    --color-button: #92A6CD;
+    --color-blue-bg: #0E2C49;
+    --color-bg-1: #FFFFFF;
+    --color-bg-2: #0E2C49;
+    --color-bg-3: #0E2C49;
+    
+    /* Couleurs - Alarmes et Alertes */
+    --color-error: #E63250;
+    --color-error-light: #FDF1F4;
+    --color-warning: #DB7200;
+    --color-warning-light: #FFF8F0;
+    --color-success: #009E7D;
+    --color-success-light: #F0FFFC;
+    --color-notify-1: #0094C2;
+    --color-notify-1-light: #F0FBFF;
+    --color-notify-2: #1F4492;
+    --color-notify-2-light: #F1F5FB;
+    
+    /* Couleurs - Secondaires pour les icônes d'applications */
+    --color-brick: #E59790;
+    --color-sienna: #BDA6A5;
+    --color-brown: #D6A256;
+    --color-khaki: #AEAE7F;
+    --color-olive: #91B764;
+    --color-button-alt: #2BBBD4;
+    --color-electric-blue: #73B1E6;
+    --color-bluish-grey: #93AFC3;
+    --color-lavender: #A9A2F4;
+    --color-purple: #D399C8;
+    
+    /* Palettes additionnelles pour les icônes d'applications */
+    --app-color-1: #3498db;  /* Bleu */
+    --app-color-2: #e74c3c;  /* Rouge */
+    --app-color-3: #2ecc71;  /* Vert */
+    --app-color-4: #f39c12;  /* Orange */
+    --app-color-5: #9b59b6;  /* Violet */
+    --app-color-6: #1abc9c;  /* Turquoise */
+    --app-color-7: #d35400;  /* Orange foncé */
+    --app-color-8: #16a085;  /* Vert foncé */
+    --app-color-9: #8e44ad;  /* Violet foncé */
+    --app-color-10: #2980b9; /* Bleu foncé */
+    
+    /* Typographie */
+    --font-family: 'Source Sans Pro', sans-serif;
+    --font-weight-regular: 400;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-black: 900;
+    --font-weight-light: 300;
+    --font-weight-extralight: 200;
+    
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 24px;
+    --font-size-xxl: 32px;
+    
+    /* Mappage aux couleurs existantes pour compatibilité */
+    --primary: var(--color-active);
+    --secondary: var(--color-button-alt);
+    --light: var(--color-bg-1);
+    --dark: var(--color-blue-bg);
+    
+    /* Couleurs d'état */
+    --success: var(--color-success);
+    --info: var(--color-notify-1);
+    --warning: var(--color-warning);
+    --danger: var(--color-error);
+    
+    /* Nuances de gris */
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-400: #ced4da;
+    --gray-500: #adb5bd;
+    --gray-800: #343a40;
+    
+    /* Ombres */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+    
+    /* Arrondis */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 50px;
+    
+    /* Espacement */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* Transitions */
+    --transition-speed: 0.2s;
+    --transition-timing: ease;
+    
+    /* Variables pour le mode clair (par défaut) */
+    --bg-light: #f5f7fa;  /* Léger gris bleuté au lieu de blanc pur */
+    --bg-dark: var(--color-blue-bg);
+    --text-light: var(--color-interactive);
+    --text-dark: var(--color-bg-1);
+    --card-bg: white;
+    --card-border: var(--gray-300);
+    --item-hover: rgba(14, 44, 73, 0.08);  /* Un peu plus visible */
+    
+    /* Variables spécifiques au dashboard */
+    --app-icon-size: 48px;
+    --app-tile-size: 110px;
+    --app-tile-gap: var(--spacing-md);
+    --category-spacing: var(--spacing-xl);
+    --footer-bg: var(--color-blue-bg);  /* Fond du footer identique à l'en-tête */
+}
+
+/* Variables pour le mode sombre */
+.dark-mode {
+    /* Couleurs - Fond Bleu (Dark Mode) */
+    --color-interactive: #FFFFFF;
+    --color-informative: rgba(255, 255, 255, 0.7);
+    --color-inactive: rgba(255, 255, 255, 0.15);
+    
+    --bg-light: #121212;
+    --bg-dark: var(--color-blue-bg);
+    --text-light: var(--color-bg-1);
+    --text-dark: var(--gray-300);
+    --card-bg: #1e1e1e;
+    --card-border: #2d2d2d;
+    --item-hover: rgba(255, 255, 255, 0.05);
+    
+    /* Ajustement des couleurs principales pour le mode sombre */
+    --primary: var(--color-button-alt);
+    --info: var(--color-electric-blue);
+    --danger: var(--color-error);
+}

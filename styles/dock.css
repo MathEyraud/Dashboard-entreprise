@@ -1,0 +1,206 @@
+/*------------------------------------------------------
+ * dock.css
+ * 
+ * Styles pour le dock de navigation latéral
+ *------------------------------------------------------*/
+
+/* Container principal du dock */
+.quick-dock {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 70px;
+    z-index: 90;
+    transition: all 0.3s ease;
+}
+
+/* État rétracté du dock */
+.quick-dock.collapsed {
+    left: -60px;
+}
+
+/* Container interne du dock */
+.dock-container {
+    background-color: var(--color-blue-bg);
+    border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
+    padding: var(--spacing-md) 0;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    max-height: 80vh;
+    overflow-y: auto;
+    scrollbar-width: none; /* Pour Firefox */
+}
+
+/* Masquer la scrollbar tout en gardant la fonctionnalité */
+.dock-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Bouton de toggle pour afficher/masquer le dock */
+.dock-toggle {
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background-color: var(--color-blue-bg);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+/* Rotation de l'icône quand le dock est rétracté */
+.quick-dock.collapsed .dock-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Hover sur le bouton toggle */
+.dock-toggle:hover {
+    background-color: var(--color-button-alt);
+}
+
+/* Titre du dock */
+.dock-title {
+    color: white;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Container des catégories */
+.dock-apps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    width: 100%;
+    padding: 0 var(--spacing-sm);
+}
+
+/* Catégorie individuelle dans le dock */
+.dock-category {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--border-radius-lg);
+    color: white;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* État actif d'une catégorie */
+.dock-category.active {
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Effet hover sur les icônes (style macOS) */
+.dock-category:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Icône de la catégorie */
+.dock-category i {
+    font-size: 24px;
+    transition: all 0.2s ease;
+}
+
+/* Tooltip pour le nom de la catégorie */
+.dock-category::after {
+    content: attr(data-name);
+    position: absolute;
+    left: 60px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* Affichage du tooltip au survol */
+.dock-category:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Adaptation pour le mode sombre */
+.dark-mode .dock-container {
+    background-color: #1e1e1e; /* Un peu plus clair que le fond dark pour contraste */
+    border: 1px solid var(--card-border);
+}
+
+.dark-mode .dock-toggle {
+    background-color: #1e1e1e;
+    border: 1px solid var(--card-border);
+}
+
+/* Animation de pulsation pour suggérer l'interaction */
+@keyframes pulse {
+    0% {
+        transform: translateY(-50%) scale(1);
+    }
+    50% {
+        transform: translateY(-50%) scale(1.1);
+    }
+    100% {
+        transform: translateY(-50%) scale(1);
+    }
+}
+
+/* Appliquer l'animation au premier chargement */
+.dock-toggle.pulse {
+    animation: pulse 2s ease-in-out 2;
+}
+
+/* Adaptation mobile */
+@media (max-width: 768px) {
+    .quick-dock {
+        width: 60px;
+    }
+    
+    .dock-category {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .dock-category i {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .quick-dock {
+        width: 50px;
+    }
+    
+    .dock-category {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .dock-category i {
+        font-size: 18px;
+    }
+}
