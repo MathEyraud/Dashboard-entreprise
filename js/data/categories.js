@@ -14,7 +14,7 @@ const CATEGORIES_METADATA = {
     categories: {
         // Métadonnées pour la catégorie OPTI
         opti: {
-            color: "#3498db",
+            color: "#E1051E",
             priority: 1,
             tags: ["serveurs", "production", "opti"],
             shortDescription: "Serveurs principaux OPTI"

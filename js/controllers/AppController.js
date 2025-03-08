@@ -45,28 +45,22 @@ class AppController {
         // Change la catégorie dans le modèle
         this.categoryModel.setCurrentCategoryId(categoryId);
         
-        // Met à jour les indicateurs visuels d'onglet actif
-        this.uiManager.updateActiveCategoryTab(categoryId);
-        this.dockManager.setActiveCategory(categoryId);
-        
-        // Fait défiler vers la catégorie
-        const categoryElement = document.getElementById(`category-${categoryId}`);
-        if (categoryElement) {
-            categoryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        // Met à jour l'affichage complet avec scroll car c'est un changement manuel
+        this.updateDisplay(false);
     }
     
     /**
      * Met à jour l'affichage
+     * @param {boolean} isInitialLoad - Indique s'il s'agit du chargement initial
      */
-    updateDisplay() {
+    updateDisplay(isInitialLoad = false) {
         // Récupère les informations nécessaires
         const categories = this.categoryModel.getOrderedCategories();
         const currentCategoryId = this.categoryModel.getCurrentCategoryId();
         
         // Met à jour l'interface utilisateur principale
         this.uiManager.updateCategoryNav(categories, currentCategoryId);
-        this.uiManager.updateCategories(categories, currentCategoryId);
+        this.uiManager.updateCategories(categories, currentCategoryId, isInitialLoad);
         
         // Met à jour le dock avec les catégories pour la navigation rapide
         this.dockManager.updateDockCategories(categories, currentCategoryId, (categoryId) => {
@@ -78,8 +72,8 @@ class AppController {
      * Initialise l'application
      */
     init() {
-        // Met à jour l'affichage
-        this.updateDisplay();
+        // Met à jour l'affichage en spécifiant qu'il s'agit du chargement initial
+        this.updateDisplay(true);
         
         // Met à jour le timestamp de dernière visite
         StorageService.updatePreference('lastVisit', new Date().toISOString());

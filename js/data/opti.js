@@ -19,7 +19,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 1",
             url: "https://opti-srv1.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur principal OPTI"
         },
         {
@@ -27,7 +27,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 2",
             url: "https://opti-srv2.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur secondaire OPTI"
         },
         {
@@ -35,7 +35,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 3",
             url: "https://opti-srv3.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de backup OPTI"
         },
         {
@@ -43,7 +43,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 4",
             url: "https://opti-srv4.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de test OPTI"
         },
         {
@@ -51,7 +51,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 5",
             url: "https://opti-srv5.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de développement OPTI"
         },
         {
@@ -59,7 +59,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 6",
             url: "https://opti-srv6.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de pré-production OPTI"
         },
         {
@@ -67,7 +67,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 7",
             url: "https://opti-srv7.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de production OPTI"
         },
         {
@@ -75,7 +75,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 8",
             url: "https://opti-srv8.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de recette OPTI"
         },
         {
@@ -83,7 +83,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 9",
             url: "https://opti-srv9.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de validation OPTI"
         },
         {
@@ -91,7 +91,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 10",
             url: "https://opti-srv10.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de qualification OPTI"
         },
         {
@@ -99,7 +99,7 @@ const OPTI_DATA = {
             name: "Serveur OPTI 11",
             url: "https://opti-srv11.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur d'intégration OPTI"
         },
         {
@@ -107,8 +107,16 @@ const OPTI_DATA = {
             name: "Serveur OPTI 12",
             url: "https://opti-srv12.example.com",
             icon: "server",
-            color: "#3498db",
+            color: "#E1051E",
             description: "Serveur de démonstration OPTI"
-        }
+        }, 
+        {
+            id: "incident",
+            name: "Incident",
+            url: "https://incident.example.com",
+            icon: "exclamation-triangle",
+            color: "#e74c3c",
+            description: "Suivi des incidents"
+        },
     ]
 };

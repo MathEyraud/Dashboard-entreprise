@@ -83,7 +83,7 @@ class UIManager {
      * @param {Array} categories - Liste des catégories ordonnées
      * @param {string} currentCategoryId - ID de la catégorie actuellement sélectionnée
      */
-    updateCategories(categories, currentCategoryId) {
+    updateCategories(categories, currentCategoryId, isInitialLoad = true) {
         if (!this.categoriesContainerElement) return;
         
         // Vide le conteneur
@@ -96,7 +96,7 @@ class UIManager {
         }
         
         // Fait défiler jusqu'à la catégorie active
-        this._scrollToActiveCategory(currentCategoryId);
+        this._scrollToActiveCategory(currentCategoryId, isInitialLoad);
     }
     
     /**
@@ -197,16 +197,28 @@ class UIManager {
     }
     
     /**
-     * Fait défiler jusqu'à la catégorie active
+     * Fait défiler jusqu'à la catégorie active avec un décalage pour la visibilité du titre
      * @param {string} categoryId - ID de la catégorie active
+     * @param {boolean} isInitialLoad - Indique s'il s'agit du chargement initial
      * @private
      */
-    _scrollToActiveCategory(categoryId) {
-        // Attend que le DOM soit mis à jour
+    _scrollToActiveCategory(categoryId, isInitialLoad = false) {
+        // Ne fait pas défiler si c'est le chargement initial
+        if (isInitialLoad) return;
+
         setTimeout(() => {
             const categoryElement = document.getElementById(`category-${categoryId}`);
             if (categoryElement) {
-                categoryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Calcul de la position avec décalage
+                const headerHeight = document.querySelector('header').offsetHeight;
+                const extraOffset = 20; // Espace supplémentaire en pixels
+                const elementPosition = categoryElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerHeight - extraOffset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
             }
         }, 100);
     }

@@ -30,6 +30,14 @@ const OUTILS_DATA = {
             description: "Suite logicielle HCL"
         },
         {
+            id: "vendredi",
+            name: "Vendredi",
+            url: "file:///C:/Program%20Files/HCL/Application.exe", // Exemple de chemin, à modifier
+            icon: "mug-hot",
+            color: "#2980b9",
+            description: "Application de gestion des croissant du vendredi"
+        },
+        {
             id: "app-link",
             name: "Raccourcis Apps",
             url: "file:///C:/Users/Public/Desktop/", // Exemple de chemin, à modifier

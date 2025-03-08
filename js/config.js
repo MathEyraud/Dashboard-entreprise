@@ -33,7 +33,7 @@ const APP_CONFIG = {
     CATEGORY_ICONS: {
         'opti': 'fas fa-server',
         'secuopti': 'fas fa-shield-alt',
-        'opc': 'fas fa-database',
+        'opc': 'fa-solid fa-server',
         'gestion': 'fas fa-tasks',
         'correcteur': 'fas fa-language',
         'goal': 'fas fa-bullseye',
