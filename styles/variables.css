@@ -49,6 +49,10 @@
     --app-color-8: #16a085;  /* Vert foncé */
     --app-color-9: #8e44ad;  /* Violet foncé */
     --app-color-10: #2980b9; /* Bleu foncé */
+
+    /* Valeurs RGB pour les transparences */
+    --color-active-rgb: 22, 65, 148; /* Équivalent RGB de #164194 */
+    --color-button-alt-rgb: 43, 187, 212; /* Équivalent RGB de #2BBBD4 */
     
     /* Typographie */
     --font-family: 'Source Sans Pro', sans-serif;

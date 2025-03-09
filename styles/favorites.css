@@ -1,0 +1,136 @@
+/* styles/favorites.css - Styles pour la fonctionnalité favoris */
+
+/* Section des favoris */
+.favorites-section {
+    margin-bottom: var(--category-spacing);
+    border-left: 3px solid var(--color-active);
+    background-color: rgba(var(--color-active-rgb), 0.05);
+}
+
+.dark-mode .favorites-section {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--color-button-alt);
+}
+
+.favorites-section .category-title {
+    color: var(--color-active);
+}
+
+.dark-mode .favorites-section .category-title {
+    color: var(--color-button-alt);
+}
+
+.favorites-section .category-title i {
+    color: #FFD700; /* Couleur d'or pour l'étoile */
+}
+
+/* Badge favori sur les tuiles */
+.app-favorite-toggle {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* État par défaut: visible dans la section favoris, invisible ailleurs */
+.category-section:not(.favorites-section) .app-favorite-toggle {
+    opacity: 0;
+}
+
+/* Rendre visible au survol dans les sections normales */
+.category-section:not(.favorites-section) .app-tile:hover .app-favorite-toggle {
+    opacity: 1;
+}
+
+/* Toujours visible dans la section favoris */
+.favorites-section .app-favorite-toggle {
+    opacity: 0.9;
+}
+
+.app-favorite-toggle:hover {
+    transform: scale(1.1);
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+}
+
+.app-favorite-toggle i {
+    font-size: 14px;
+    color: #888;
+}
+
+.app-favorite-toggle:hover i.far {
+    color: #333;
+}
+
+/* Style pour les étoiles qui indiquent que l'app est en favoris */
+.app-favorite-toggle i.fas {
+    color: #FFD700; /* Étoile pleine en or */
+}
+
+.app-favorite-toggle:hover i.fas {
+    color: #FFA500; /* Orange plus foncé au survol */
+}
+
+/* Mode sombre: augmenter la visibilité de l'étoile */
+.dark-mode .app-favorite-toggle i.fas {
+    color: #FFC107; /* Jaune plus vif */
+    filter: drop-shadow(0px 0px 2px rgba(255, 255, 255, 0.5)); /* Léger halo */
+}
+
+/* Amélioration du contraste du bouton en mode sombre */
+.dark-mode .app-favorite-toggle {
+    background-color: rgba(0, 0, 0, 0.4); /* Fond plus sombre */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Bordure subtile */
+}
+
+.dark-mode .app-favorite-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.6); /* Fond encore plus sombre au survol */
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Amélioration de la visibilité de l'icône sur fond sombre */
+.dark-mode .app-favorite-toggle i.far {
+    color: #CCC; /* Gris clair pour l'étoile vide */
+}
+
+/* Animation lors du clic sur favoris */
+.app-favorite-toggle:active {
+    transform: scale(0.9);
+}
+
+/* Adaptation mobile */
+@media (max-width: 768px) {
+    .app-favorite-toggle {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .app-favorite-toggle i {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-favorite-toggle {
+        width: 20px;
+        height: 20px;
+        top: 4px;
+        right: 4px;
+    }
+    
+    .app-favorite-toggle i {
+        font-size: 10px;
+    }
+}

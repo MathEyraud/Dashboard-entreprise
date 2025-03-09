@@ -7,6 +7,7 @@ A modern and elegant dashboard to quickly access all your enterprise tools and s
 - **Section-based dashboard** - Access all your tools and servers organized by categories
 - **Quick navigation** - Side dock for instantly switching between sections
 - **Application tiles** - Smartphone-inspired interface for immediate and visual access
+- **Favorites system** - Mark and access your most-used applications in a dedicated section
 - **Light/dark mode** - Adapt the interface to your preferences and time of day
 - **Responsive design** - Optimized for all screens, from desktop to mobile
 - **Zero server dependencies** - Fully client-side application, no complex installation
@@ -16,6 +17,7 @@ A modern and elegant dashboard to quickly access all your enterprise tools and s
 
 The dashboard comes with a generic structure that you can customize to fit your needs:
 
+- **Favorites** - Quick access to your most frequently used applications
 - **Server Sections** - Organize your various servers by purpose or environment
 - **Management Tools** - Quick access to your project management, documentation, and collaboration tools
 - **Language Tools** - Spell-checkers, grammar tools, and translation services
@@ -47,6 +49,7 @@ enterprise-dashboard/
 │   ├── base.css            # Base styles
 │   ├── components.css      # Interface component styles
 │   ├── dock.css            # Navigation dock styles
+│   ├── favorites.css       # Favorites system styles
 │   ├── theme-switcher.css  # Theme selector styles
 │   └── responsive.css      # Responsive adaptations
 └── js/                     # JavaScript
@@ -64,6 +67,7 @@ enterprise-dashboard/
     │   └── StorageService.js # LocalStorage management
     ├── models/             # Data models
     │   ├── CategoryModel.js  # Category model
+    │   ├── FavoritesModel.js # Favorites model
     │   └── DockStateModel.js # Navigation dock state
     ├── ui/                 # User interface
     │   ├── UIManager.js    # Interface manager
@@ -130,6 +134,12 @@ CATEGORY_ICONS: {
 if (typeof NEW_CATEGORY_DATA !== 'undefined') categories.newCategory = NEW_CATEGORY_DATA;
 ```
 
+### Using the Favorites System
+
+- **Adding favorites**: Hover over any application tile and click the star icon that appears
+- **Removing favorites**: Click the star icon on any favorited application or in the Favorites section
+- **Viewing favorites**: All favorited applications appear in the Favorites section at the top of the dashboard
+
 ### Changing Category Order
 
 Open `js/config.js` and rearrange the entries in the `CATEGORY_ORDER` array:
@@ -144,10 +154,11 @@ Modify the CSS files in the `styles/` folder, particularly:
 - `variables.css` for colors and spacing
 - `components.css` for application tile styles
 - `dock.css` for navigation dock styles
+- `favorites.css` for favorites system styles
 
 ## 💾 Data and Persistence
 
-- **User preferences**: Light/dark mode and dock state are saved in localStorage
+- **User preferences**: Light/dark mode, dock state, and favorites are saved in localStorage
 - **No sensitive data**: The application does not store any authentication data or sensitive information
 - **Local data only**: All data remains on your device
 
