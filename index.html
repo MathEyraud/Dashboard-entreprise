@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="./styles/favorites.css">
     <link rel="stylesheet" href="./styles/responsive.css">
     <link rel="stylesheet" href="./styles/dock.css">
+    <link rel="stylesheet" href="./styles/search.css">
     
     <!-- Favicon -->
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -29,6 +30,14 @@
                 <div class="logo">
                     <i class="fas fa-th"></i>
                     <span>Dashboard Entreprise</span>
+                </div>
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="globalSearch" class="search-input" placeholder="Rechercher une application...">
+                        <button id="clearSearch" class="search-clear" aria-label="Effacer la recherche"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div id="searchResults" class="search-results"></div>
                 </div>
             </div>
         </div>
@@ -100,6 +109,7 @@
     <script src="./js/ui/ThemeManager.js"></script>
     <script src="./js/ui/UIManager.js"></script>
     <script src="./js/ui/DockManager.js"></script>
+    <script src="./js/ui/SearchManager.js"></script>
     <script src="./js/main.js"></script>
 </body>
 </html>

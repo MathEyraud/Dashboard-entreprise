@@ -22,6 +22,9 @@ class AppController {
         this.uiManager = new UIManager();
         this.themeManager = new ThemeManager();
         this.dockManager = new DockManager(this.dockStateModel);
+
+        // Gestionnaire de recherche (nouveau)
+        this.searchManager = new SearchManager(this.categoryModel);
         
         // Configure les écouteurs d'événements
         this._setupEventListeners();

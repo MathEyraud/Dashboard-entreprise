@@ -12,6 +12,7 @@ A modern and elegant dashboard to quickly access all your enterprise tools and s
 - **Responsive design** - Optimized for all screens, from desktop to mobile
 - **Zero server dependencies** - Fully client-side application, no complex installation
 - **Easy customization** - Add or modify your tools with just a few lines of code
+- **Global Search** - Quickly find applications across all categories with real-time filtering
 
 ## 📋 Available Sections
 
