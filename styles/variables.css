@@ -127,6 +127,15 @@
     --app-tile-gap: var(--spacing-md);
     --category-spacing: var(--spacing-xl);
     --footer-bg: var(--color-blue-bg);  /* Fond du footer identique à l'en-tête */
+
+    /* Variables spécifiques au dashboard */
+    --app-icon-size: 48px;
+    --app-icon-font-size: 24px;
+    --app-tile-size: 110px;
+    --app-tile-height: 140px;
+    --app-icon-margin-top: 10px;
+    --app-tile-gap: var(--spacing-md);
+    --category-spacing: var(--spacing-xl);
 }
 
 /* Variables pour le mode sombre */

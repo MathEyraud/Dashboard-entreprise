@@ -23,8 +23,11 @@ class AppController {
         this.themeManager = new ThemeManager();
         this.dockManager = new DockManager(this.dockStateModel);
 
-        // Gestionnaire de recherche (nouveau)
+        // Gestionnaire de recherche
         this.searchManager = new SearchManager(this.categoryModel);
+        
+        // Gestionnaire d'affichage
+        this.displayManager = new DisplayManager();
         
         // Configure les écouteurs d'événements
         this._setupEventListeners();
@@ -46,6 +49,14 @@ class AppController {
                 return this.favoritesModel.isFavorite(appId);
             }
         );
+        
+        // Écouteur pour les changements de disposition d'affichage
+        document.addEventListener('displayLayoutChanged', (event) => {
+            if (event.detail && event.detail.layout) {
+                // Mettre à jour l'affichage pour refléter la nouvelle disposition
+                this.updateDisplay(true);
+            }
+        });
     }
     
     /**

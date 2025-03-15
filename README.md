@@ -9,6 +9,7 @@ A modern and elegant dashboard to quickly access all your enterprise tools and s
 - **Application tiles** - Smartphone-inspired interface for immediate and visual access
 - **Favorites system** - Mark and access your most-used applications in a dedicated section
 - **Light/dark mode** - Adapt the interface to your preferences and time of day
+- **Display options** - Customize density and layout with the floating settings panel
 - **Responsive design** - Optimized for all screens, from desktop to mobile
 - **Zero server dependencies** - Fully client-side application, no complex installation
 - **Easy customization** - Add or modify your tools with just a few lines of code
@@ -24,6 +25,21 @@ The dashboard comes with a generic structure that you can customize to fit your 
 - **Language Tools** - Spell-checkers, grammar tools, and translation services
 - **Installed Tools** - Links to local applications installed on your computer
 - **And more** - Easily add any other category relevant to your work environment
+
+## 🎨 Display Customization
+
+Personalize your dashboard appearance with these display options:
+
+### Density Options
+- **Compact** - Smaller tiles and less spacing to fit more content on screen
+- **Standard** - Balanced size and spacing for everyday use
+- **Comfortable** - Larger tiles and more spacing for enhanced readability
+
+### Layout Options
+- **Grid** - Classic tile-based layout organized in a responsive grid
+- **List** - Detailed list view with application descriptions
+
+Access these settings through the floating palette button in the bottom-left corner of the screen. Your preferences are saved automatically.
 
 ## 🔧 Installation
 
@@ -52,6 +68,7 @@ enterprise-dashboard/
 │   ├── dock.css            # Navigation dock styles
 │   ├── favorites.css       # Favorites system styles
 │   ├── theme-switcher.css  # Theme selector styles
+│   ├── display-options.css # Display customization styles
 │   └── responsive.css      # Responsive adaptations
 └── js/                     # JavaScript
     ├── config.js           # Central configuration
@@ -73,7 +90,9 @@ enterprise-dashboard/
     ├── ui/                 # User interface
     │   ├── UIManager.js    # Interface manager
     │   ├── ThemeManager.js # Theme manager
-    │   └── DockManager.js  # Dock manager
+    │   ├── DockManager.js  # Dock manager
+    │   ├── SearchManager.js # Search functionality
+    │   └── DisplayManager.js # Display options manager
     └── controllers/        # Controllers
         └── AppController.js # Main controller
 ```
@@ -141,6 +160,13 @@ if (typeof NEW_CATEGORY_DATA !== 'undefined') categories.newCategory = NEW_CATEG
 - **Removing favorites**: Click the star icon on any favorited application or in the Favorites section
 - **Viewing favorites**: All favorited applications appear in the Favorites section at the top of the dashboard
 
+### Changing Display Options
+
+- **Access settings**: Click the palette icon in the bottom-left corner
+- **Change density**: Select Compact, Standard, or Comfortable from the dropdown
+- **Change layout**: Select Grid or List from the dropdown
+- **Persistence**: Your display preferences are automatically saved between sessions
+
 ### Changing Category Order
 
 Open `js/config.js` and rearrange the entries in the `CATEGORY_ORDER` array:
@@ -156,10 +182,11 @@ Modify the CSS files in the `styles/` folder, particularly:
 - `components.css` for application tile styles
 - `dock.css` for navigation dock styles
 - `favorites.css` for favorites system styles
+- `display-options.css` for display customization styles
 
 ## 💾 Data and Persistence
 
-- **User preferences**: Light/dark mode, dock state, and favorites are saved in localStorage
+- **User preferences**: Light/dark mode, dock state, favorites, and display options are saved in localStorage
 - **No sensitive data**: The application does not store any authentication data or sensitive information
 - **Local data only**: All data remains on your device
 

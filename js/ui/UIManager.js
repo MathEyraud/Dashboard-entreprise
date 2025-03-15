@@ -302,6 +302,19 @@ class UIManager {
         nameElement.className = 'app-name';
         nameElement.textContent = app.name;
         
+        // Conteneur de contenu pour la vue détaillée
+        const contentElement = document.createElement('div');
+        contentElement.className = 'app-content';
+        contentElement.appendChild(nameElement);
+        
+        // Description pour la vue détaillée
+        if (app.description) {
+            const descriptionElement = document.createElement('div');
+            descriptionElement.className = 'app-description';
+            descriptionElement.textContent = app.description;
+            contentElement.appendChild(descriptionElement);
+        }
+        
         // Bouton de favori
         const favoriteButton = document.createElement('button');
         favoriteButton.className = 'app-favorite-toggle';
@@ -338,7 +351,13 @@ class UIManager {
         });
         
         tileLink.appendChild(iconElement);
-        tileLink.appendChild(nameElement);
+        // Pour la vue grille standard, on ajoute directement le nom
+        // Pour la vue liste, on ajoute le conteneur de contenu
+        if (document.body.classList.contains('layout-list')) {
+            tileLink.appendChild(contentElement);
+        } else {
+            tileLink.appendChild(nameElement);
+        }
         tileLink.appendChild(favoriteButton);
         
         return tileLink;

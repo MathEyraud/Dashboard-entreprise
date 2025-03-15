@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="./styles/responsive.css">
     <link rel="stylesheet" href="./styles/dock.css">
     <link rel="stylesheet" href="./styles/search.css">
+    <link rel="stylesheet" href="./styles/display-options.css">
     
     <!-- Favicon -->
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -80,7 +81,9 @@
     <!-- Pied de page -->
     <footer>
         <div class="container footer-container">
-            <div class="footer-left"></div>
+            <div class="footer-left">
+                <!-- Le contenu du footer est vide car les options d'affichage sont maintenant dans une carte flottante -->
+            </div>
             <p class="footer-center">Dashboard Entreprise &copy; 2025 - Eyraud Mathieu</p>
             <div id="themeToggleContainer" class="footer-right">
                 <!-- Le ThemeManager va insérer le switch du mode sombre ici -->
@@ -103,13 +106,17 @@
     <script src="./js/config.js"></script>
     <script src="./js/services/StorageService.js"></script>
     <script src="./js/controllers/AppController.js"></script>
+
     <script src="./js/models/CategoryModel.js"></script>
     <script src="./js/models/FavoritesModel.js"></script>
     <script src="./js/models/DockStateModel.js"></script>
+
     <script src="./js/ui/ThemeManager.js"></script>
     <script src="./js/ui/UIManager.js"></script>
     <script src="./js/ui/DockManager.js"></script>
     <script src="./js/ui/SearchManager.js"></script>
+    <script src="./js/ui/DisplayManager.js"></script>
+
     <script src="./js/main.js"></script>
 </body>
 </html>

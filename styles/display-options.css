@@ -1,0 +1,364 @@
+/* styles/display-options.css - Styles pour les options d'affichage */
+
+/* Style de la Carte Flottante */
+.display-options-card {
+    position: fixed;
+    left: 20px;
+    bottom: 80px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius-md);
+    padding: 12px 15px;
+    box-shadow: var(--shadow-md);
+    z-index: 50;
+    width: 240px;
+}
+
+.display-options-card-header {
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.display-options-card-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+}
+
+.display-options-card-close {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.display-options-card-close:hover {
+    background-color: var(--item-hover);
+}
+
+.display-options-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.display-selector-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.display-selector-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
+    font-weight: var(--font-weight-semibold);
+}
+
+.display-selector {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-light);
+    padding: 8px 10px;
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.2s ease;
+}
+
+.display-selector:hover {
+    border-color: var(--color-active);
+}
+
+.display-selector:focus {
+    outline: none;
+    border-color: var(--color-active);
+    box-shadow: 0 0 0 1px var(--color-active);
+}
+
+.dark-mode .display-selector:focus {
+    border-color: var(--color-button-alt);
+    box-shadow: 0 0 0 1px var(--color-button-alt);
+}
+
+.display-toggle-button {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    background-color: var(--color-active);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    z-index: 51;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.display-toggle-button:hover {
+    background-color: var(--color-active);
+    transform: scale(1.1);
+}
+
+.display-toggle-button i {
+    font-size: var(--font-size-md);
+}
+
+.dark-mode .display-toggle-button {
+    background-color: var(--color-button-alt);
+}
+
+/* État fermé de la carte */
+.display-options-card.closed {
+    transform: translateY(20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
+}
+
+/* État ouvert de la carte */
+.display-options-card.open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* ==== Densité d'affichage ==== */
+
+/* Compact: Réduit les espacements et la taille des tuiles */
+.density-compact {
+    --app-tile-size: 90px;
+    --app-tile-height: 110px; /* Hauteur fixe pour la tuile */
+    --app-icon-size: 32px;
+    --app-icon-font-size: 16px; /* Taille proportionnelle pour l'icône */
+    --app-icon-margin-top: 5px; /* Marge pour aligner en haut */
+    --app-tile-gap: 10px;
+    --category-spacing: 1.5rem;
+}
+
+.density-compact .category-title {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-sm);
+}
+
+.density-compact .category-description {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.density-compact .app-name {
+    font-size: var(--font-size-xs);
+}
+
+/* Standard: Valeurs par défaut */
+.density-standard {
+    --app-tile-height: 140px; /* Hauteur fixe pour la tuile */
+    --app-icon-font-size: 24px; /* Taille proportionnelle pour l'icône */
+    --app-icon-margin-top: 10px; /* Marge pour aligner en haut */
+}
+
+/* Confortable: Augmente les espacements et la taille des tuiles */
+.density-comfortable {
+    --app-tile-size: 130px;
+    --app-tile-height: 170px; /* Hauteur fixe pour la tuile */
+    --app-icon-size: 56px;
+    --app-icon-font-size: 28px; /* Taille proportionnelle pour l'icône */
+    --app-icon-margin-top: 15px; /* Marge pour aligner en haut */
+    --app-tile-gap: 20px;
+    --category-spacing: 3rem;
+}
+
+.density-comfortable .category-title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-md);
+}
+
+.density-comfortable .category-description {
+    font-size: var(--font-size-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.density-comfortable .app-name {
+    font-size: var(--font-size-md);
+}
+
+/* ==== Disposition des tuiles ==== */
+
+/* Grille: Disposition par défaut */
+.layout-grid {
+    /* Utilise les styles par défaut */
+}
+
+/* Liste: Affichage en liste avec description */
+.layout-list .app-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.layout-list .app-tile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 80px; /* Hauteur fixe pour la vue liste */
+    aspect-ratio: auto;
+    padding: 0 15px;
+    border-radius: var(--border-radius-md);
+}
+
+.layout-list .app-icon {
+    margin-bottom: 0;
+    margin-top: 0; /* Pas de marge supérieure en vue liste */
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.layout-list .app-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.layout-list .app-name {
+    margin-top: 0;
+    text-align: left;
+    font-size: var(--font-size-md);
+    -webkit-line-clamp: 1; /* Limiter à une ligne en vue liste */
+}
+
+.layout-list .app-description {
+    display: block;
+    color: var(--color-informative);
+    font-size: var(--font-size-xs);
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 40ch;
+}
+
+.layout-list .app-favorite-toggle {
+    top: 50%;
+    transform: translateY(-50%);
+    right: 15px;
+}
+
+/* Améliorer l'apparence des descriptions */
+.layout-list .app-description {
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.layout-list .app-tile:hover .app-description {
+    opacity: 1;
+}
+
+/* Ajouter des transitions pour les changements de mise en page */
+.app-tile, .app-icon, .app-name, .app-content, .app-description, .app-grid {
+    transition: all 0.3s ease;
+}
+
+/* Adaptations pour la disposition confortable et en liste */
+.density-comfortable.layout-list .app-tile {
+    height: 100px;
+    padding: 0 20px;
+}
+
+.density-comfortable.layout-list .app-icon {
+    margin-right: 20px;
+}
+
+.density-comfortable.layout-list .app-description {
+    font-size: var(--font-size-sm);
+    margin-top: 5px;
+    max-width: 60ch;
+}
+
+/* Adaptations pour la disposition compacte et en liste */
+.density-compact.layout-list .app-tile {
+    height: 60px;
+}
+
+.density-compact.layout-list .app-description {
+    max-width: 30ch;
+}
+
+/* Adaptations responsive pour les différentes vues */
+@media (max-width: 768px) {
+    .display-options-wrapper {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .density-comfortable {
+        --app-tile-size: 110px;
+        --app-tile-height: 150px;
+        --app-icon-size: 48px;
+        --app-icon-font-size: 24px;
+    }
+    
+    .layout-list .app-description {
+        max-width: 30ch;
+    }
+    
+    /* Adaptation pour la carte flottante */
+    .display-options-card {
+        width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .density-compact {
+        --app-tile-size: 80px;
+        --app-tile-height: 100px;
+        --app-icon-size: 28px;
+        --app-icon-font-size: 14px;
+    }
+    
+    .layout-list .app-description {
+        max-width: 20ch;
+    }
+    
+    .layout-list .app-tile {
+        height: auto;
+        min-height: 50px;
+        padding: 10px;
+    }
+    
+    /* Adaptation pour les petits écrans en mode grille */
+    .layout-grid .app-tile {
+        padding: var(--spacing-xs);
+    }
+    
+    /* Adaptation pour la carte flottante */
+    .display-options-card {
+        width: 180px;
+        left: 10px;
+        bottom: 70px;
+    }
+    
+    .display-toggle-button {
+        width: 36px;
+        height: 36px;
+        left: 10px;
+        bottom: 10px;
+    }
+}
