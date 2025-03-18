@@ -145,3 +145,35 @@ p {
     justify-content: flex-end;
     padding-right: var(--spacing-md);
 }
+
+/* Amélioration du contraste pour le logo en mode sombre */
+.dark-mode .logo {
+    color: white; /* Blanc pur pour un contraste maximal */
+}
+
+.dark-mode .logo i {
+    color: var(--color-button-alt); /* Utilise la couleur cyan/bleu clair du thème sombre */
+}
+
+/* Amélioration du contraste pour les liens de procédure en mode sombre */
+.dark-mode .category-link {
+    color: var(--color-button-alt); /* Couleur principale plus claire */
+    background-color: rgba(43, 187, 212, 0.1); /* Fond légèrement teinté */
+    padding: 5px 10px;
+    border-radius: var(--border-radius-sm);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dark-mode .category-link:hover {
+    color: white;
+    background-color: rgba(43, 187, 212, 0.2); /* Fond plus visible au survol */
+}
+
+/* Effet subtil pour renforcer la visibilité des icônes dans les liens */
+.dark-mode .category-link i {
+    color: var(--color-button-alt);
+}
+
+.dark-mode .category-link:hover i {
+    color: white;
+}
