@@ -104,12 +104,26 @@ class DockManager {
      * @param {Array} categories - Liste des catégories
      * @param {string} currentCategoryId - ID de la catégorie active
      * @param {Function} categoryClickCallback - Fonction à appeler lors du clic sur une catégorie
+     * @param {Function} settingsClickCallback - Fonction à appeler lors du clic sur le bouton de paramètres
      */
-    updateDockCategories(categories, currentCategoryId, categoryClickCallback) {
+    updateDockCategories(categories, currentCategoryId, categoryClickCallback, settingsClickCallback) {
         if (!this.dockAppsElement) return;
         
         // Vide le dock
         this.dockAppsElement.innerHTML = '';
+        
+        // Ajoute le bouton de paramètres
+        if (settingsClickCallback) {
+            const settingsButton = document.createElement('div');
+            settingsButton.className = 'dock-settings-button';
+            settingsButton.innerHTML = '<i class="fas fa-cog"></i>';
+            settingsButton.setAttribute('title', 'Paramètres de visibilité');
+            
+            // Ajoute un écouteur d'événement pour le clic
+            settingsButton.addEventListener('click', () => settingsClickCallback());
+            
+            this.dockAppsElement.appendChild(settingsButton);
+        }
         
         // Si aucune catégorie, affiche un message
         if (!categories || categories.length === 0) {
@@ -131,8 +145,8 @@ class DockManager {
             
             this.dockAppsElement.appendChild(categoryElement);
         }
-    }
-    
+    }    
+
     /**
      * Marque une catégorie comme active dans le dock
      * @param {string} categoryId - ID de la catégorie active

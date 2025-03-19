@@ -5,6 +5,8 @@ A modern and elegant dashboard to quickly access all your enterprise tools and s
 ## 🚀 Features
 
 - **Section-based dashboard** - Access all your tools and servers organized by categories
+- **Section visibility** - Show/hide sections to create a fully personalized dashboard
+- **Collapsible sections** - Collapse/expand sections to focus on what matters
 - **Quick navigation** - Side dock for instantly switching between sections
 - **Application tiles** - Smartphone-inspired interface for immediate and visual access
 - **Favorites system** - Mark and access your most-used applications in a dedicated section
@@ -39,13 +41,61 @@ Personalize your dashboard appearance with these display options:
 - **Grid** - Classic tile-based layout organized in a responsive grid
 - **List** - Detailed list view with application descriptions
 
-Access these settings through the floating palette button in the bottom-left corner of the screen. Your preferences are saved automatically.
+### Section Management
+- **Visibility Control** - Show/hide specific sections from the settings panel in the dock
+- **Collapsible Sections** - Minimize sections you don't need at the moment
+- **Global Toggle** - Expand or collapse all sections with a single click
+- **Persistent State** - Your collapsed/expanded and visibility preferences are remembered between sessions
+
+Access these settings through:
+- The floating palette button in the bottom-right corner for display options
+- The gear icon in the side dock for section visibility control
+
+### Managing Section Visibility
+
+- **Access settings**: Click the gear icon in the side dock to open the visibility panel
+- **Toggle sections**: Use checkboxes to show/hide individual sections
+- **Quick actions**: Use "Show all" to display all sections or "Hide all" to hide everything except favorites
+- **Persistence**: Your section visibility preferences are automatically saved between sessions
+- **Favorites remain**: The Favorites section remains visible even when using "Hide all" for quick access to your essential tools
+
+### Collapsing Sections
+
+- **Collapse/Expand**: Click the chevron icon next to the procedure link in each section header
+- **Global Toggle**: Use the "Collapse All"/"Expand All" button at the top of the dashboard
+- **Persistent State**: Your preferred section collapse states are remembered between sessions
+
+### Changing Display Options
+
+- **Access settings**: Click the palette icon in the bottom-right corner
+- **Change density**: Select Compact, Standard, or Comfortable from the dropdown
+- **Change layout**: Select Grid or List from the dropdown
+- **Persistence**: Your display preferences are automatically saved between sessions
+
+### Changing Category Order
+
+Open `js/config.js` and rearrange the entries in the `CATEGORY_ORDER` array:
+
+```javascript
+CATEGORY_ORDER: ['servers1', 'servers2', 'new-category', 'servers3', ...],
+```
+
+### Customizing Appearance
+
+Modify the CSS files in the `styles/` folder, particularly:
+- `variables.css` for colors and spacing
+- `components.css` for application tile styles
+- `dock.css` for navigation dock styles
+- `favorites.css` for favorites system styles
+- `section-collapse.css` for collapsible sections styles
+- `display-options.css` for display customization styles
+- `visibility-panel.css` for section visibility panel styles
 
 ## 🔧 Installation
 
 1. **Download the files** to a folder of your choice
    ```bash
-   git clone https://github.com/MathEyraud/enterprise-dashboard.git
+   git clone https://github.com/MathEyraud/Dashboard-entreprise.git
    ```
    or download and extract the ZIP file
 
@@ -59,42 +109,46 @@ Access these settings through the floating palette button in the bottom-left cor
 
 ```
 enterprise-dashboard/
-├── index.html              # Main HTML entry point
-├── README.md               # Project documentation
-├── styles/                 # CSS styles
-│   ├── variables.css       # Variables (colors, spacing, etc.)
-│   ├── base.css            # Base styles
-│   ├── components.css      # Interface component styles
-│   ├── dock.css            # Navigation dock styles
-│   ├── favorites.css       # Favorites system styles
-│   ├── theme-switcher.css  # Theme selector styles
-│   ├── display-options.css # Display customization styles
-│   └── responsive.css      # Responsive adaptations
-└── js/                     # JavaScript
-    ├── config.js           # Central configuration
-    ├── main.js             # JS entry point
-    ├── data/               # Category data
-    │   ├── servers1.js     # First server category
-    │   ├── servers2.js     # Second server category
-    │   ├── servers3.js     # Third server category
-    │   ├── management.js   # Management tools
-    │   ├── language.js     # Language tools
-    │   ├── installed.js    # Installed tools
-    │   └── categories.js   # Category metadata
-    ├── services/           # Services
-    │   └── StorageService.js # LocalStorage management
-    ├── models/             # Data models
-    │   ├── CategoryModel.js  # Category model
-    │   ├── FavoritesModel.js # Favorites model
-    │   └── DockStateModel.js # Navigation dock state
-    ├── ui/                 # User interface
-    │   ├── UIManager.js    # Interface manager
-    │   ├── ThemeManager.js # Theme manager
-    │   ├── DockManager.js  # Dock manager
-    │   ├── SearchManager.js # Search functionality
-    │   └── DisplayManager.js # Display options manager
-    └── controllers/        # Controllers
-        └── AppController.js # Main controller
+├── index.html                      # Main HTML entry point
+├── README.md                       # Project documentation
+├── styles/                         # CSS styles
+│   ├── variables.css               # Variables (colors, spacing, etc.)
+│   ├── base.css                    # Base styles
+│   ├── components.css              # Interface component styles
+│   ├── dock.css                    # Navigation dock styles
+│   ├── favorites.css               # Favorites system styles
+│   ├── theme-switcher.css          # Theme selector styles
+│   ├── section-collapse.css        # Collapsible sections styles
+│   ├── display-options.css         # Display customization styles
+│   ├── visibility-panel.css        # Section visibility panel styles
+│   └── responsive.css              # Responsive adaptations
+└── js/                             # JavaScript
+    ├── config.js                   # Central configuration
+    ├── main.js                     # JS entry point
+    ├── data/                       # Category data
+    │   ├── servers1.js             # First server category
+    │   ├── servers2.js             # Second server category
+    │   ├── servers3.js             # Third server category
+    │   ├── management.js           # Management tools
+    │   ├── language.js             # Language tools
+    │   ├── installed.js            # Installed tools
+    │   └── categories.js           # Category metadata
+    ├── services/                   # Services
+    │   └── StorageService.js       # LocalStorage management
+    ├── models/                     # Data models
+    │   ├── CategoryModel.js        # Category model
+    │   ├── FavoritesModel.js       # Favorites model
+    │   ├── DockStateModel.js       # Navigation dock state
+    │   └── VisibilityModel.js      # Section visibility model
+    ├── ui/                         # User interface
+    │   ├── UIManager.js            # Interface manager
+    │   ├── ThemeManager.js         # Theme manager
+    │   ├── DockManager.js          # Dock manager
+    │   ├── SearchManager.js        # Search functionality
+    │   ├── DisplayManager.js       # Display options manager
+    │   └── VisibilityManager.js    # Section visibility manager
+    └── controllers/                # Controllers
+        └── AppController.js        # Main controller
 ```
 
 ## 🎨 Customization
@@ -160,33 +214,9 @@ if (typeof NEW_CATEGORY_DATA !== 'undefined') categories.newCategory = NEW_CATEG
 - **Removing favorites**: Click the star icon on any favorited application or in the Favorites section
 - **Viewing favorites**: All favorited applications appear in the Favorites section at the top of the dashboard
 
-### Changing Display Options
-
-- **Access settings**: Click the palette icon in the bottom-left corner
-- **Change density**: Select Compact, Standard, or Comfortable from the dropdown
-- **Change layout**: Select Grid or List from the dropdown
-- **Persistence**: Your display preferences are automatically saved between sessions
-
-### Changing Category Order
-
-Open `js/config.js` and rearrange the entries in the `CATEGORY_ORDER` array:
-
-```javascript
-CATEGORY_ORDER: ['servers1', 'servers2', 'new-category', 'servers3', ...],
-```
-
-### Customizing Appearance
-
-Modify the CSS files in the `styles/` folder, particularly:
-- `variables.css` for colors and spacing
-- `components.css` for application tile styles
-- `dock.css` for navigation dock styles
-- `favorites.css` for favorites system styles
-- `display-options.css` for display customization styles
-
 ## 💾 Data and Persistence
 
-- **User preferences**: Light/dark mode, dock state, favorites, and display options are saved in localStorage
+- **User preferences**: Light/dark mode, dock state, favorites, section visibility, collapsed sections, and display options are saved in localStorage
 - **No sensitive data**: The application does not store any authentication data or sensitive information
 - **Local data only**: All data remains on your device
 

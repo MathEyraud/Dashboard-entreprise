@@ -17,6 +17,7 @@ class AppController {
         this.categoryModel = new CategoryModel();
         this.dockStateModel = new DockStateModel();
         this.favoritesModel = new FavoritesModel();
+        this.visibilityModel = new VisibilityModel();
         
         // Interface utilisateur
         this.uiManager = new UIManager();
@@ -28,6 +29,13 @@ class AppController {
         
         // Gestionnaire d'affichage
         this.displayManager = new DisplayManager();
+        
+        // Gestionnaire de visibilité
+        this.visibilityManager = new VisibilityManager(
+            this.visibilityModel,
+            this.categoryModel,
+            () => this.updateDisplay(true)
+        );
         
         // Configure les écouteurs d'événements
         this._setupEventListeners();
@@ -93,21 +101,32 @@ class AppController {
      */
     updateDisplay(isInitialLoad = false) {
         // Récupère les informations nécessaires
-        const categories = this.categoryModel.getOrderedCategories();
+        let categories = this.categoryModel.getOrderedCategories();
         const currentCategoryId = this.categoryModel.getCurrentCategoryId();
+        
+        // Filtre les catégories selon leur visibilité
+        const visibleCategories = this.visibilityManager.filterVisibleCategories(categories);
+        
         const favoriteApps = this.favoritesModel.getFavoriteApps(this.categoryModel);
         
         // Met à jour l'interface utilisateur principale
-        this.uiManager.updateCategoryNav(categories, currentCategoryId);
-        this.uiManager.updateCategories(categories, currentCategoryId, isInitialLoad);
+        this.uiManager.updateCategoryNav(visibleCategories, currentCategoryId);
+        this.uiManager.updateCategories(visibleCategories, currentCategoryId, isInitialLoad);
         this.uiManager.updateFavorites(favoriteApps, (appId, categoryId) => {
             this.toggleFavorite(appId, categoryId);
         });
         
         // Met à jour le dock avec les catégories pour la navigation rapide
-        this.dockManager.updateDockCategories(categories, currentCategoryId, (categoryId) => {
-            this.changeCategory(categoryId);
-        });
+        this.dockManager.updateDockCategories(
+            categories, // Toutes les catégories pour le panneau de configuration
+            currentCategoryId, 
+            (categoryId) => {
+                this.changeCategory(categoryId);
+            },
+            () => {
+                this.visibilityManager.togglePanel();
+            }
+        );
     }
     
     /**

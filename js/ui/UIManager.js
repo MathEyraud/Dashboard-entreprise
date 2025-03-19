@@ -15,7 +15,6 @@ class UIManager {
     constructor() {
         // Éléments du DOM
         this.categoriesContainerElement = document.getElementById('categoriesContainer');
-        this.categoryNavElement = document.getElementById('categoryNav');
         this.favoritesCallback = null;
         
         // État des sections réduites
@@ -32,7 +31,6 @@ class UIManager {
     _checkElements() {
         const elements = [
             { element: this.categoriesContainerElement, name: 'categoriesContainer' },
-            { element: this.categoryNavElement, name: 'categoryNav' }
         ];
         
         for (const { element, name } of elements) {

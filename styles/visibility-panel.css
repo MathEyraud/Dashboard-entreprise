@@ -1,0 +1,201 @@
+/* styles/visibility-panel.css - Styles pour le panneau de visibilité des catégories */
+
+.visibility-panel {
+    position: fixed;
+    left: 100px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    width: 280px;
+    z-index: 95;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.visibility-panel.closed {
+    transform: translateY(-50%) translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.visibility-panel.open {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.visibility-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.visibility-panel-title {
+    font-size: var(--font-size-md);
+    margin: 0;
+    color: var(--text-light);
+}
+
+.visibility-panel-close {
+    background: none;
+    border: none;
+    color: var(--color-informative);
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.visibility-panel-close:hover {
+    background-color: var(--item-hover);
+    color: var(--text-light);
+}
+
+.visibility-panel-content {
+    padding: var(--spacing-md);
+}
+
+.visibility-panel-description {
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-informative);
+}
+
+.visibility-categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.visibility-category-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    transition: background-color 0.2s ease;
+}
+
+.visibility-category-item:hover {
+    background-color: var(--item-hover);
+}
+
+.visibility-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.visibility-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    flex: 1;
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+}
+
+.visibility-label i {
+    width: 16px;
+    text-align: center;
+    color: var(--color-informative);
+}
+
+.visibility-panel-actions {
+    display: flex;
+    justify-content: space-between;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--card-border);
+}
+
+.visibility-show-all, .visibility-hide-all {
+    background-color: var(--color-active);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.visibility-show-all:hover, .visibility-hide-all:hover {
+    background-color: var(--color-button);
+}
+
+.visibility-hide-all {
+    background-color: var(--color-informative);
+}
+
+.visibility-hide-all:hover {
+    background-color: var(--color-interactive);
+}
+
+.dark-mode .visibility-show-all {
+    background-color: var(--color-button-alt);
+}
+
+.dark-mode .visibility-hide-all {
+    background-color: var(--color-informative);
+}
+
+.dark-mode .visibility-show-all:hover {
+    background-color: var(--color-active);
+}
+
+.dark-mode .visibility-label i {
+    color: var(--color-button-alt);
+}
+
+.dark-mode .visibility-hide-all:hover {
+    background-color: var(--color-interactive);
+}
+
+/* Style pour l'icône dans le dock */
+.dock-settings-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    background-color: var(--color-blue-bg);
+    border-radius: var(--border-radius-md);
+    color: white;
+    cursor: pointer;
+    margin: 0 auto var(--spacing-md);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.dock-settings-button:hover {
+    background-color: var(--color-active);
+    transform: scale(1.1);
+}
+
+.dark-mode .dock-settings-button:hover {
+    background-color: var(--color-button-alt);
+}
+
+/* Adaptation mobile */
+@media (max-width: 768px) {
+    .visibility-panel {
+        width: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .visibility-panel {
+        width: 220px;
+        left: 60px;
+    }
+}
