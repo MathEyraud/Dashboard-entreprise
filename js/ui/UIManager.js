@@ -625,4 +625,23 @@ class UIManager {
         container.appendChild(button);
         return container;
     }
+
+    /**
+     * S'assure qu'une section de catégorie est dépliée
+     * @param {string} categoryId - ID de la catégorie
+     * @returns {boolean} true si une modification a été effectuée
+     */
+    ensureSectionExpanded(categoryId) {
+        // Vérifie si la section est repliée
+        if (this._collapsedSections[categoryId]) {
+            // Récupère l'élément de section correspondant
+            const sectionElement = document.getElementById(`category-${categoryId}`);
+            if (sectionElement) {
+                // Déplie la section
+                this.toggleSectionCollapse(categoryId, sectionElement);
+                return true;
+            }
+        }
+        return false;
+    }
 }

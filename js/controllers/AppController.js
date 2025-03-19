@@ -75,6 +75,9 @@ class AppController {
         // Change la catégorie dans le modèle
         this.categoryModel.setCurrentCategoryId(categoryId);
         
+        // S'assure que la section est dépliée si elle était repliée
+        this.uiManager.ensureSectionExpanded(categoryId);
+        
         // Met à jour l'affichage complet avec scroll car c'est un changement manuel
         this.updateDisplay(false);
     }
