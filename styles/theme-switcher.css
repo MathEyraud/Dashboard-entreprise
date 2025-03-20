@@ -83,7 +83,12 @@ input:checked + .slider:before {
 .theme-icon {
     margin-left: var(--spacing-sm);
     font-size: 1.2rem;
-    color: var(--color-bg-1);
+    color:var(--color-active);
+}
+
+/* Couleur spécifique pour l'icône de lune en mode sombre */
+.dark-mode .theme-icon {
+    color: var(--color-button-alt);
 }
 
 /* Structure flexible du footer */
@@ -93,19 +98,8 @@ input:checked + .slider:before {
     align-items: center;
 }
 
-.footer-left {
-    flex: 1;
-}
-
 .footer-center {
     flex: 2;
     text-align: center;
     margin: 0;
-}
-
-.footer-right {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: var(--spacing-md);
 }

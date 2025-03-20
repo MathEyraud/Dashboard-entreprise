@@ -129,21 +129,10 @@ p {
     align-items: center;
 }
 
-.footer-left {
-    flex: 1;
-}
-
 .footer-center {
     flex: 2;
     text-align: center;
     margin: 0;
-}
-
-.footer-right {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: var(--spacing-md);
 }
 
 /* Amélioration du contraste pour le logo en mode sombre */

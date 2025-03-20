@@ -18,6 +18,9 @@ class AppController {
         this.dockStateModel = new DockStateModel();
         this.favoritesModel = new FavoritesModel();
         this.visibilityModel = new VisibilityModel();
+
+        // Gestionnaire d'affichage
+        this.displayManager = new DisplayManager();
         
         // Interface utilisateur
         this.uiManager = new UIManager();
@@ -26,9 +29,6 @@ class AppController {
 
         // Gestionnaire de recherche
         this.searchManager = new SearchManager(this.categoryModel);
-        
-        // Gestionnaire d'affichage
-        this.displayManager = new DisplayManager();
         
         // Gestionnaire de visibilité
         this.visibilityManager = new VisibilityManager(

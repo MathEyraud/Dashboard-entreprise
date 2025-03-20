@@ -89,7 +89,7 @@ class ThemeManager {
      * @private
      */
     _createThemeToggle() {
-        // Récupère le conteneur du footer
+        // Récupère le conteneur dans le panneau d'options
         const themeContainer = document.getElementById('themeToggleContainer');
         if (!themeContainer) {
             console.error("Élément 'themeToggleContainer' non trouvé dans le DOM");
@@ -98,11 +98,7 @@ class ThemeManager {
         
         // Crée l'élément wrapper pour l'interrupteur
         const wrapper = document.createElement('div');
-        wrapper.className = 'theme-switch-wrapper';
-        
-        // Crée le label de texte
-        const textLabel = document.createElement('span');
-        textLabel.className = 'theme-switch-label';
+        wrapper.className = 'theme-switch-wrapper theme-in-panel';
         
         // Crée l'interrupteur
         const switchLabel = document.createElement('label');
@@ -127,10 +123,9 @@ class ThemeManager {
         switchLabel.appendChild(switchInput);
         switchLabel.appendChild(slider);
         
-        // Nouvel ordre des éléments
-        wrapper.appendChild(textLabel);    // Texte en premier (à gauche)
+        // Assemblage du wrapper
         wrapper.appendChild(switchLabel);  // Toggle au milieu
-        wrapper.appendChild(iconSpan);     // Icône en dernier (à droite)
+        wrapper.appendChild(iconSpan);     // Icône à droite
         
         themeContainer.appendChild(wrapper);
         
@@ -141,7 +136,7 @@ class ThemeManager {
         // Ajoute l'écouteur d'événement pour le changement de thème
         this._themeToggle.addEventListener('change', () => this._handleThemeToggle());
     }
-    
+
     /**
      * Gère le basculement du thème
      * @private
@@ -152,7 +147,7 @@ class ThemeManager {
         // Met à jour l'état du mode sombre
         this._isDarkMode = this._themeToggle.checked;
         
-        // Met à jour le label et l'icône
+        // Met à jour l'icône
         if (this._themeIcon) {
             this._themeIcon.innerHTML = this._isDarkMode ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         }
@@ -191,8 +186,7 @@ class ThemeManager {
             const savedPreference = StorageService.getPreference('darkMode', null);
             if (savedPreference === null && prefersDarkScheme.matches) {
                 this._isDarkMode = true;
-                if (this._themeToggle) this._themeToggle.checked = true;
-                if (this._themeIcon) this._themeIcon.innerHTML = '<i class="fas fa-moon"></i>';
+                if (this._themeToggle) this._themeToggle.checked = 'dark';
                 this._applyTheme();
                 this._saveThemePreference();
             }
@@ -202,8 +196,7 @@ class ThemeManager {
                 // Ne change le thème automatiquement que si aucune préférence n'a été définie manuellement
                 if (StorageService.getPreference('darkMode', null) === null) {
                     this._isDarkMode = e.matches;
-                    if (this._themeToggle) this._themeToggle.checked = this._isDarkMode;
-                    if (this._themeIcon) this._themeIcon.innerHTML = this._isDarkMode ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+                    if (this._themeToggle) this._themeToggle.checked = this._isDarkMode ? 'dark' : 'light';
                     this._applyTheme();
                 }
             });
@@ -216,33 +209,30 @@ class ThemeManager {
     enableDarkMode() {
         if (!this._isDarkMode) {
             this._isDarkMode = true;
-            if (this._themeToggle) this._themeToggle.checked = true;
-            if (this._themeIcon) this._themeIcon.innerHTML = '<i class="fas fa-moon"></i>';
+            if (this._themeToggle) this._themeToggle.checked = 'dark';
             this._applyTheme();
             this._saveThemePreference();
         }
     }
-    
+
     /**
      * Désactive manuellement le mode sombre
      */
     disableDarkMode() {
         if (this._isDarkMode) {
             this._isDarkMode = false;
-            if (this._themeToggle) this._themeToggle.checked = false;
-            if (this._themeIcon) this._themeIcon.innerHTML = '<i class="fas fa-sun"></i>';
+            if (this._themeToggle) this._themeToggle.checked = 'light';
             this._applyTheme();
             this._saveThemePreference();
         }
     }
-    
+
     /**
      * Bascule manuellement le mode sombre
      */
     toggleDarkMode() {
         this._isDarkMode = !this._isDarkMode;
-        if (this._themeToggle) this._themeToggle.checked = this._isDarkMode;
-        if (this._themeIcon) this._themeIcon.innerHTML = this._isDarkMode ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+        if (this._themeToggle) this._themeToggle.checked = this._isDarkMode ? 'dark' : 'light';
         this._applyTheme();
         this._saveThemePreference();
     }

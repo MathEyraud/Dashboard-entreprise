@@ -255,11 +255,23 @@ class DisplayManager {
         );
         content.appendChild(this._layoutSelector);
         
+        // Ajoute le sélecteur de thème
+        const themeContainer = document.createElement('div');
+        themeContainer.className = 'display-selector-container';
+        themeContainer.id = 'themeToggleContainer';
+        
+        const themeLabel = document.createElement('label');
+        themeLabel.className = 'display-selector-label';
+        themeLabel.textContent = 'Thème';
+        themeContainer.appendChild(themeLabel);
+        
+        // Le contenu du themeContainer sera rempli par ThemeManager
+        content.appendChild(themeContainer);
+        
         card.appendChild(content);
         document.body.appendChild(card);
         this._optionsCard = card;
     }
-    
     /**
      * Crée un sélecteur d'option d'affichage
      * @param {string} id - ID du sélecteur

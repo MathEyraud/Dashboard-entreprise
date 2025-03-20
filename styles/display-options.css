@@ -3,8 +3,8 @@
 /* Style de la Carte Flottante */
 .display-options-card {
     position: fixed;
-    right: 20px;
-    bottom: 80px;
+    right: 5%;
+    bottom: 12%;
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: var(--border-radius-md);
@@ -91,10 +91,20 @@
     box-shadow: 0 0 0 1px var(--color-button-alt);
 }
 
+/* Style pour le conteneur de sélection du thème */
+.theme-mode-control {
+    width: 100%;
+}
+
+/* Espacement supplémentaire pour le dernier sélecteur */
+.display-options-wrapper .display-selector-container:last-child {
+    margin-bottom: var(--spacing-sm);
+}
+
 .display-toggle-button {
     position: fixed;
-    right: 20px;
-    bottom: 20px;
+    right: 5%;
+    bottom: 5%;
     background-color: var(--color-active);
     color: white;
     border: none;
@@ -242,6 +252,9 @@
     text-align: left;
     font-size: var(--font-size-md);
     -webkit-line-clamp: 1; /* Limiter à une ligne en vue liste */
+    text-overflow: ellipsis; /* Ajoute les points de suspension */
+    max-width: 100%; /* Assure que la largeur maximale est respectée */
+    overflow: hidden; /* Garantit que le contenu débordant est masqué */
 }
 
 .layout-list .app-description {
@@ -299,6 +312,36 @@
 
 .density-compact.layout-list .app-description {
     max-width: 30ch;
+}
+
+/* Adaptation du switch de thème dans le panneau des options */
+.theme-in-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--spacing-xs);
+}
+
+.theme-in-panel .theme-switch {
+    margin-right: var(--spacing-sm);
+}
+
+/* Espacement supplémentaire pour le dernier sélecteur */
+.display-options-wrapper .display-selector-container:last-child {
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Style pour le switch dans le panneau des options */
+.theme-in-panel .slider {
+    background-color: var(--card-border);
+}
+
+.dark-mode .theme-in-panel .slider {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-in-panel .theme-icon {
+    margin-left: 0;
 }
 
 /* Adaptations responsive pour les différentes vues */
