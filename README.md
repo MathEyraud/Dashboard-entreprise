@@ -15,7 +15,7 @@ A modern and elegant dashboard to quickly access all your enterprise tools and s
 - **Responsive design** - Optimized for all screens, from desktop to mobile
 - **Zero server dependencies** - Fully client-side application, no complex installation
 - **Easy customization** - Add or modify your tools with just a few lines of code
-- **Global Search** - Quickly find applications across all categories with real-time filtering
+- **Enhanced search system** - Find applications quickly with smart, partial-word matching
 
 ## 📋 Available Sections
 
@@ -91,6 +91,45 @@ Modify the CSS files in the `styles/` folder, particularly:
 - `display-options.css` for display customization styles
 - `visibility-panel.css` for section visibility panel styles
 
+## 🔍 Enhanced Search System
+
+The Enterprise Dashboard features a powerful search system to help you quickly find the applications you need:
+
+### Smart Search Features
+
+- **Keyword-based search** - Find applications by name, description, or tags
+- **Partial-word matching** - Type just the beginning of a word (e.g., "no" finds "Notion")
+- **Fuzzy search** - Tolerates minor typos and spelling variations
+- **Category filtering** - Narrow down search results to specific categories
+- **Keyboard navigation** - Use arrow keys to navigate search results
+- **Keyboard shortcuts** - Press `/` from anywhere to focus the search field
+- **Recently used** - Quickly access applications you use frequently
+- **Search history** - View and reuse your recent searches
+
+### Using the Search
+
+1. **Start searching** - Type in the search box or press `/` to focus it
+2. **Navigate results** - Use arrow keys to move between results
+3. **Filter by category** - Use the category dropdown to narrow your search
+4. **Open an application** - Click a result or press Enter when it's selected
+5. **Clear search** - Click the X button or press Escape
+
+### Customizing Search Results
+
+Applications can be enriched with tags to make them more discoverable:
+
+```javascript
+{
+    id: "notion",
+    name: "Notion",
+    url: "https://notion.so",
+    icon: "book-open",
+    color: "#000000",
+    description: "Knowledge management tool",
+    tags: ["wiki", "documentation", "notes", "collaboration", "kanban"]
+}
+```
+
 ## 🔧 Installation
 
 1. **Download the files** to a folder of your choice
@@ -104,6 +143,12 @@ Modify the CSS files in the `styles/` folder, particularly:
    - Works locally or via network share
 
 3. **Navigate between sections** using the horizontal tabs or the side dock
+
+### Using the Favorites System
+
+- **Adding favorites**: Hover over any application tile and click the star icon that appears
+- **Removing favorites**: Click the star icon on any favorited application or in the Favorites section
+- **Viewing favorites**: All favorited applications appear in the Favorites section at the top of the dashboard
 
 ## 📂 Project Structure
 
@@ -121,6 +166,7 @@ enterprise-dashboard/
 │   ├── section-collapse.css        # Collapsible sections styles
 │   ├── display-options.css         # Display customization styles
 │   ├── visibility-panel.css        # Section visibility panel styles
+│   ├── search.css                  # Enhanced search functionality styles
 │   └── responsive.css              # Responsive adaptations
 └── js/                             # JavaScript
     ├── config.js                   # Central configuration
@@ -134,12 +180,15 @@ enterprise-dashboard/
     │   ├── installed.js            # Installed tools
     │   └── categories.js           # Category metadata
     ├── services/                   # Services
-    │   └── StorageService.js       # LocalStorage management
+    │   ├── StorageService.js       # LocalStorage management
+    │   ├── SearchModelService.js   # Search indexing and matching
+    │   └── UsageTrackingService.js # Application usage tracking
     ├── models/                     # Data models
     │   ├── CategoryModel.js        # Category model
     │   ├── FavoritesModel.js       # Favorites model
     │   ├── DockStateModel.js       # Navigation dock state
-    │   └── VisibilityModel.js      # Section visibility model
+    │   ├── VisibilityModel.js      # Section visibility model
+    │   └── SearchHistoryModel.js   # Search history management
     ├── ui/                         # User interface
     │   ├── UIManager.js            # Interface manager
     │   ├── ThemeManager.js         # Theme manager
@@ -166,6 +215,7 @@ enterprise-dashboard/
     icon: "chart-line",        // Font Awesome icon (without "fa-")
     color: "#9b59b6",          // Background color
     description: "Description" // Application description
+    tags: ["keyword1", "keyword2", "keyword3"] // Optional search tags
 }
 ```
 
@@ -208,15 +258,11 @@ CATEGORY_ICONS: {
 if (typeof NEW_CATEGORY_DATA !== 'undefined') categories.newCategory = NEW_CATEGORY_DATA;
 ```
 
-### Using the Favorites System
-
-- **Adding favorites**: Hover over any application tile and click the star icon that appears
-- **Removing favorites**: Click the star icon on any favorited application or in the Favorites section
-- **Viewing favorites**: All favorited applications appear in the Favorites section at the top of the dashboard
-
 ## 💾 Data and Persistence
 
 - **User preferences**: Light/dark mode, dock state, favorites, section visibility, collapsed sections, and display options are saved in localStorage
+- **Search history**: Recent searches are saved for quick access
+- **Usage tracking**: The system remembers which applications you use most frequently
 - **No sensitive data**: The application does not store any authentication data or sensitive information
 - **Local data only**: All data remains on your device
 
@@ -232,6 +278,30 @@ if (typeof NEW_CATEGORY_DATA !== 'undefined') categories.newCategory = NEW_CATEG
 - Contains no external APIs or third-party services
 - Executes no server-side code
 - Sends no data externally
+
+## 🧩 Project Architecture
+
+The application follows an MVC (Model-View-Controller) architecture with these main components:
+
+### Models
+- **CategoryModel**: Manages category data and organization
+- **FavoritesModel**: Tracks favorite applications
+- **VisibilityModel**: Controls section visibility
+- **SearchHistoryModel**: Keeps track of search history
+- **DockStateModel**: Manages the state of the navigation dock
+
+### Services
+- **StorageService**: Handles localStorage operations
+- **SearchModelService**: Provides search indexing and matching
+- **UsageTrackingService**: Tracks application usage patterns
+
+### UI Managers
+- **UIManager**: Handles the main interface elements
+- **SearchManager**: Controls search functionality
+- **ThemeManager**: Manages light/dark theme switching
+- **DockManager**: Controls the side navigation dock
+- **DisplayManager**: Handles display options and layouts
+- **VisibilityManager**: Manages section visibility panel
 
 ## 📝 License
 

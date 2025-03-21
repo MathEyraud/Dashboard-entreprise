@@ -44,7 +44,8 @@ header {
     max-width: 1200px; /* Même largeur max que le contenu des sections */
     width: 100%;
     margin: 0 auto;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
+    padding: var(--spacing-xs) 0;
 }
 
 .logo {
@@ -55,6 +56,8 @@ header {
     font-size: 1.5rem;
     color: var(--color-bg-1);
     white-space: nowrap; /* Empêche le logo de se diviser */
+    padding: var(--spacing-xs) 0;
+    min-width: 220px; /* Assure une taille minimale pour l'équilibre avec la recherche */
 }
 
 .logo i {

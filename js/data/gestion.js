@@ -19,7 +19,8 @@ const GESTION_DATA = {
             url: "https://notion.so",
             icon: "book-open",
             color: "#000000",
-            description: "Gestion des connaissances"
+            description: "Gestion des connaissances",
+            tags: ["wiki", "documentation", "notes", "connaissance", "collaboration", "kanban"]
         },
         {
             id: "incident",
@@ -27,7 +28,8 @@ const GESTION_DATA = {
             url: "https://incident.example.com",
             icon: "exclamation-triangle",
             color: "#e74c3c",
-            description: "Suivi des incidents"
+            description: "Suivi des incidents",
+            tags: ["ticket", "bug", "erreur", "problème", "support", "monitoring"]
         },
         {
             id: "annuaire",
@@ -35,7 +37,8 @@ const GESTION_DATA = {
             url: "https://annuaire.example.com",
             icon: "address-book",
             color: "#3498db",
-            description: "Annuaire d'entreprise"
+            description: "Annuaire d'entreprise",
+            tags: ["contacts", "personnel", "équipe", "employés", "téléphone", "email"]
         },
         {
             id: "dico",
@@ -43,7 +46,8 @@ const GESTION_DATA = {
             url: "https://dico.example.com",
             icon: "book",
             color: "#9b59b6",
-            description: "Dictionnaire technique"
+            description: "Dictionnaire technique",
+            tags: ["définition", "terminologie", "glossaire", "technique", "vocabulaire"]
         },
         {
             id: "github",
@@ -51,7 +55,8 @@ const GESTION_DATA = {
             url: "https://github.com",
             icon: "fab fa-github",
             color: "#333333",
-            description: "Gestion du code source"
+            description: "Gestion du code source",
+            tags: ["code", "développement", "git", "repository", "versionning", "collaborative"]
         },
         {
             id: "bilan-hebdo",
@@ -59,7 +64,8 @@ const GESTION_DATA = {
             url: "https://bilan.example.com",
             icon: "chart-bar",
             color: "#2ecc71",
-            description: "Bilans hebdomadaires"
+            description: "Bilans hebdomadaires",
+            tags: ["rapport", "statistiques", "hebdomadaire", "mesure", "performance", "suivi"]
         },
         {
             id: "figma",
@@ -67,7 +73,8 @@ const GESTION_DATA = {
             url: "https://www.figma.com/",
             icon: "fa-brands fa-figma",
             color: "#FF3E00",
-            description: "Outil de design collaboratif"
+            description: "Outil de design collaboratif",
+            tags: ["design", "prototype", "ui", "ux", "maquette", "interface"]
         },
     ]
 };

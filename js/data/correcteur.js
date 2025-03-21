@@ -20,7 +20,8 @@ const CORRECTEUR_DATA = {
             url: "https://www.scribens.fr/",
             icon: "spell-check",
             color: "#2ecc71",
-            description: "Correcteur orthographique en ligne"
+            description: "Correcteur orthographique en ligne",
+            tags: ["orthographe", "grammaire", "correction", "français", "texte", "rédaction"]
         },
         {
             id: "bon-patron",
@@ -28,7 +29,8 @@ const CORRECTEUR_DATA = {
             url: "https://bonpatron.com/",
             icon: "check-double",
             color: "#e74c3c",
-            description: "Correcteur grammatical et orthographique"
+            description: "Correcteur grammatical et orthographique",
+            tags: ["grammaire", "orthographe", "correction", "français", "texte", "relecture"]
         },
         {
             id: "reverso-correcteur",
@@ -36,7 +38,8 @@ const CORRECTEUR_DATA = {
             url: "https://www.reverso.net/orthographe/correcteur-francais/",
             icon: "spell-check",
             color: "#3498db",
-            description: "Correcteur orthographique Reverso"
+            description: "Correcteur orthographique Reverso",
+            tags: ["orthographe", "grammaire", "correction", "français", "texte", "reverso"]
         },
         
         // Traducteurs
@@ -46,7 +49,8 @@ const CORRECTEUR_DATA = {
             url: "https://www.deepl.com/translator",
             icon: "language",
             color: "#6c5ce7",
-            description: "Traducteur IA de haute qualité"
+            description: "Traducteur IA de haute qualité",
+            tags: ["traduction", "ia", "langue", "international", "intelligence artificielle", "multilangue"]
         },
         {
             id: "google-traduction",
@@ -54,7 +58,8 @@ const CORRECTEUR_DATA = {
             url: "https://translate.google.com/",
             icon: "language",
             color: "#4285F4",
-            description: "Service de traduction Google"
+            description: "Service de traduction Google",
+            tags: ["traduction", "google", "langue", "international", "multilangue", "dictionnaire"]
         },
         {
             id: "reverso-traduction",
@@ -62,7 +67,8 @@ const CORRECTEUR_DATA = {
             url: "https://www.reverso.net/text-translation",
             icon: "exchange-alt",
             color: "#0984e3",
-            description: "Traducteur contextuel Reverso"
+            description: "Traducteur contextuel Reverso",
+            tags: ["traduction", "contexte", "langue", "international", "reverso", "exemples"]
         }
     ]
 };

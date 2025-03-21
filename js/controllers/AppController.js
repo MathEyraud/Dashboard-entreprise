@@ -18,6 +18,11 @@ class AppController {
         this.dockStateModel = new DockStateModel();
         this.favoritesModel = new FavoritesModel();
         this.visibilityModel = new VisibilityModel();
+        this.searchHistoryModel = new SearchHistoryModel();
+
+        // Services
+        this.usageTrackingService = new UsageTrackingService();
+        this.searchModelService = new SearchModelService(this.categoryModel);
 
         // Gestionnaire d'affichage
         this.displayManager = new DisplayManager();
@@ -27,8 +32,13 @@ class AppController {
         this.themeManager = new ThemeManager();
         this.dockManager = new DockManager(this.dockStateModel);
 
-        // Gestionnaire de recherche
-        this.searchManager = new SearchManager(this.categoryModel);
+        // Gestionnaire de recherche avec les nouveaux services
+        this.searchManager = new SearchManager(
+            this.categoryModel,
+            this.searchModelService,
+            this.usageTrackingService,
+            this.searchHistoryModel
+        );
         
         // Gestionnaire de visibilité
         this.visibilityManager = new VisibilityManager(
@@ -96,6 +106,9 @@ class AppController {
         
         // Met à jour l'interface
         this.updateDisplay(true);
+        
+        // Reconstruire l'index de recherche car les favoris ont changé
+        this.searchModelService.rebuildIndex();
     }
     
     /**

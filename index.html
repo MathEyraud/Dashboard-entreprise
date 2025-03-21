@@ -40,6 +40,12 @@
                         <input type="text" id="globalSearch" class="search-input" placeholder="Rechercher une application...">
                         <button id="clearSearch" class="search-clear" aria-label="Effacer la recherche"><i class="fas fa-times"></i></button>
                     </div>
+                    <div class="search-filters" style="display: none;">
+                        <select id="categoryFilter" class="search-filter">
+                            <option value="">Toutes les catégories</option>
+                            <!-- Options remplies dynamiquement -->
+                        </select>
+                    </div>
                     <div id="searchResults" class="search-results"></div>
                 </div>
             </div>
@@ -101,13 +107,22 @@
     <!-- Core -->
     <script src="./js/config.js"></script>
     <script src="./js/services/StorageService.js"></script>
+    
+    <!-- Services -->
+    <script src="./js/services/SearchModelService.js"></script>
+    <script src="./js/services/UsageTrackingService.js"></script>
+    
+    <!-- Controllers -->
     <script src="./js/controllers/AppController.js"></script>
 
+    <!-- Models -->
     <script src="./js/models/CategoryModel.js"></script>
     <script src="./js/models/FavoritesModel.js"></script>
     <script src="./js/models/DockStateModel.js"></script>
     <script src="./js/models/VisibilityModel.js"></script>
+    <script src="./js/models/SearchHistoryModel.js"></script>
 
+    <!-- UI -->
     <script src="./js/ui/ThemeManager.js"></script>
     <script src="./js/ui/UIManager.js"></script>
     <script src="./js/ui/DockManager.js"></script>
