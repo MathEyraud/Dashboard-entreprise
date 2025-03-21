@@ -77,6 +77,7 @@ class VisibilityManager {
         closeButton.className = 'visibility-panel-close';
         closeButton.innerHTML = '<i class="fas fa-times"></i>';
         closeButton.setAttribute('aria-label', 'Fermer');
+        closeButton.setAttribute('title', 'Fermer le panneau de visibilité');
         closeButton.addEventListener('click', () => this.closePanel());
         
         header.appendChild(title);
@@ -106,6 +107,7 @@ class VisibilityManager {
         const showAllButton = document.createElement('button');
         showAllButton.className = 'visibility-show-all';
         showAllButton.textContent = 'Afficher tout';
+        showAllButton.setAttribute('title', 'Afficher toutes les sections');
         showAllButton.addEventListener('click', () => {
             this._visibilityModel.showAllCategories();
             this.updateCategoriesList();
@@ -118,6 +120,7 @@ class VisibilityManager {
         const hideAllButton = document.createElement('button');
         hideAllButton.className = 'visibility-hide-all';
         hideAllButton.textContent = 'Masquer tout';
+        hideAllButton.setAttribute('title', 'Masquer toutes les sections sauf les favoris');
         hideAllButton.addEventListener('click', () => {
             // Récupère toutes les catégories pour les masquer
             const categories = this._categoryModel.getOrderedCategories();
@@ -172,9 +175,23 @@ class VisibilityManager {
             checkbox.className = 'visibility-checkbox';
             checkbox.checked = isVisible;
             
+            // Amélioration de l'accessibilité : tooltip pour la case à cocher
+            const tooltipText = isVisible ? 
+                `Masquer la section "${category.name}"` : 
+                `Afficher la section "${category.name}"`;
+            checkbox.setAttribute('title', tooltipText);
+            
             const label = document.createElement('label');
             label.htmlFor = `visibility-${category.id}`;
             label.className = 'visibility-label';
+            
+            // Amélioration de l'accessibilité : tooltip pour le label
+            // Inclut la description si disponible
+            let labelTooltip = category.name;
+            if (category.description) {
+                labelTooltip += ` - ${category.description}`;
+            }
+            label.setAttribute('title', labelTooltip);
             
             // Utilise l'icône de la catégorie
             const iconClass = APP_CONFIG.CATEGORY_ICONS[category.id] || 'fas fa-folder';
@@ -190,6 +207,13 @@ class VisibilityManager {
             // Ajoute un écouteur d'événement pour le changement
             checkbox.addEventListener('change', () => {
                 this._visibilityModel.setCategoryVisibility(category.id, checkbox.checked);
+                
+                // Mise à jour du tooltip après changement d'état
+                const newTooltipText = checkbox.checked ? 
+                    `Masquer la section "${category.name}"` : 
+                    `Afficher la section "${category.name}"`;
+                checkbox.setAttribute('title', newTooltipText);
+                
                 if (this._updateCallback) {
                     this._updateCallback();
                 }

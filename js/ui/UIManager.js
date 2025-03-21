@@ -338,9 +338,20 @@ class UIManager {
         if (categoryId) {
             tileLink.setAttribute('data-category-id', categoryId);
         }
+        
+        // Amélioration de l'accessibilité : ajout d'un attribut title avec le nom et la description
+        let titleText = app.name;
         if (app.description) {
+            titleText += ` - ${app.description}`;
             tileLink.setAttribute('data-description', app.description);
         }
+        
+        // Ajouter le nom de la catégorie dans l'infobulle pour les favoris
+        if (isFavoriteSection && app.categoryName) {
+            titleText += ` (${app.categoryName})`;
+        }
+        
+        tileLink.setAttribute('title', titleText);
         
         // Icône de l'application
         const iconElement = document.createElement('div');
@@ -383,6 +394,7 @@ class UIManager {
         }
         
         favoriteButton.setAttribute('aria-label', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
+        favoriteButton.setAttribute('title', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
         favoriteButton.innerHTML = isFavorite ? 
             '<i class="fas fa-star"></i>' : 
             '<i class="far fa-star"></i>';
@@ -415,8 +427,7 @@ class UIManager {
         tileLink.appendChild(favoriteButton);
         
         return tileLink;
-    }
-    
+    }    
     /**
      * Fait défiler jusqu'à la catégorie active avec un décalage pour la visibilité du titre
      * @param {string} categoryId - ID de la catégorie active

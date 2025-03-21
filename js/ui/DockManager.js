@@ -184,6 +184,13 @@ class DockManager {
         categoryElement.setAttribute('data-category-id', category.id);
         categoryElement.setAttribute('data-name', category.name);
         
+        // Amélioration de l'accessibilité : ajout d'un attribut title avec le nom et la description
+        let titleText = category.name;
+        if (category.description) {
+            titleText += ` - ${category.description}`;
+        }
+        categoryElement.setAttribute('title', titleText);
+        
         // Utilise une couleur spécifique à la catégorie ou une couleur par défaut
         const metadata = CATEGORIES_METADATA && CATEGORIES_METADATA.categories ? 
             CATEGORIES_METADATA.categories[category.id] : null;
