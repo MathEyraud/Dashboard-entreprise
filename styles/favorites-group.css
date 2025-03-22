@@ -162,9 +162,20 @@
     background-color: var(--color-active);
 }
 
-/* Styles pour les tuiles lors du drag and drop */
+/* Styles améliorés pour le glisser-déposer des applications */
 .app-tile[draggable="true"] {
     cursor: grab;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-tile[draggable="true"]:hover {
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.app-tile[draggable="true"]:active {
+    cursor: grabbing;
 }
 
 .app-tile.dragging {
@@ -178,17 +189,32 @@
     transition: all 0.2s ease;
 }
 
-.app-grid.drag-over {
-    border: 2px solid var(--color-active);
+/* Effet visuel lorsqu'on survole un groupe pendant le drag */
+.favorites-section .app-grid.drag-over {
+    background-color: rgba(var(--color-active-rgb), 0.1);
+    border: 2px dashed var(--color-active);
     border-radius: var(--border-radius-md);
-    background-color: rgba(var(--color-active-rgb), 0.08);
-    padding: var(--spacing-xs);
-    transition: all 0.2s ease;
+    padding: var(--spacing-sm);
+    min-height: 100px;
 }
 
-.dark-mode .app-grid.drag-over {
-    border-color: var(--color-button-alt);
+.dark-mode .favorites-section .app-grid.drag-over {
     background-color: rgba(var(--color-button-alt-rgb), 0.15);
+    border-color: var(--color-button-alt);
+}
+
+/* Message d'instruction pendant le drag */
+.favorites-section .app-grid.drag-over::after {
+    content: "Déposer pour ajouter aux favoris";
+    display: block;
+    text-align: center;
+    padding: var(--spacing-md);
+    color: var(--color-active);
+    font-style: italic;
+}
+
+.dark-mode .favorites-section .app-grid.drag-over::after {
+    color: var(--color-button-alt);
 }
 
 /* Styles améliorés pour le drag-and-drop */

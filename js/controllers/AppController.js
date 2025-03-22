@@ -103,30 +103,76 @@ class AppController {
     }
     
     /**
-     * Bascule une application dans les favoris
+     * Bascule une application dans les favoris ou l'ajoute à un groupe spécifique
      * @param {string} appId - ID de l'application
      * @param {string} categoryId - ID de la catégorie
+     * @param {string} [targetGroupId='general'] - ID du groupe cible (optionnel)
+     * @param {HTMLElement} [sourceElement=null] - Élément source (bouton étoile) ayant déclenché l'action
      */
-    toggleFavorite(appId, categoryId) {
-        if (this.favoritesModel.isFavorite(appId)) {
-            this.favoritesModel.removeFavorite(appId);
-        } else {
-            // Ajouter au groupe "general" par défaut
-            this.favoritesModel.addFavorite(appId, categoryId, 'general');
+    toggleFavorite(appId, categoryId, targetGroupId = 'general', sourceElement = null) {
+        // Sauvegarde la position de défilement actuelle
+        const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Détermine si l'application était déjà en favoris
+        const wasInFavorites = this.favoritesModel.isFavorite(appId);
+        
+        // NOUVEAU: Mise à jour visuelle immédiate du bouton sans recharger l'interface
+        if (sourceElement && sourceElement.classList.contains('app-favorite-toggle')) {
+            // Mettre à jour l'apparence du bouton immédiatement
+            if (wasInFavorites) {
+                // Si on retire des favoris
+                sourceElement.innerHTML = '<i class="far fa-star"></i>';
+                sourceElement.setAttribute('title', 'Ajouter aux favoris');
+                sourceElement.setAttribute('aria-label', 'Ajouter aux favoris');
+                sourceElement.classList.remove('is-favorite');
+            } else {
+                // Si on ajoute aux favoris
+                sourceElement.innerHTML = '<i class="fas fa-star"></i>';
+                sourceElement.setAttribute('title', 'Retirer des favoris');
+                sourceElement.setAttribute('aria-label', 'Retirer des favoris');
+                sourceElement.classList.add('is-favorite');
+            }
         }
         
-        // Met à jour l'interface
-        this.updateDisplay(true);
+        // Modification du modèle de données comme avant
+        if (targetGroupId !== 'general') {
+            // Si un groupe cible est spécifié (drag & drop)
+            if (wasInFavorites) {
+                this.favoritesModel.removeFavorite(appId);
+            }
+            this.favoritesModel.addFavorite(appId, categoryId, targetGroupId);
+        } else {
+            // Comportement standard du clic sur l'étoile
+            if (wasInFavorites) {
+                this.favoritesModel.removeFavorite(appId);
+            } else {
+                this.favoritesModel.addFavorite(appId, categoryId, 'general');
+            }
+        }
         
         // Reconstruire l'index de recherche car les favoris ont changé
         this.searchModelService.rebuildIndex();
+        
+        // NOUVEAU: Retarder légèrement la mise à jour complète de l'interface
+        // pour permettre à l'animation visuelle de se terminer
+        setTimeout(() => {
+            // Mise à jour complète de l'interface avec préservation du défilement
+            this.updateDisplay(true, true);
+            
+            // Restaure la position de défilement après la mise à jour du DOM
+            window.scrollTo({
+                top: scrollPosition,
+                behavior: 'auto'
+            });
+        }, 100); // Délai de 100ms pour permettre à l'animation de se terminer
     }
-    
+
     /**
-     * Mise à jour de la méthode updateDisplay
-     * Remplacer la partie des favoris dans la méthode existante
-    */
-    updateDisplay(isInitialLoad = false) {
+     * Met à jour l'affichage global de l'application
+     * @param {boolean} isInitialLoad - Indique s'il s'agit du chargement initial
+     * @param {boolean} preserveScroll - Indique s'il faut préserver la position de défilement
+     */
+    updateDisplay(isInitialLoad = false, preserveScroll = false) {
         // Récupère les informations nécessaires
         let categories = this.categoryModel.getOrderedCategories();
         const currentCategoryId = this.categoryModel.getCurrentCategoryId();
@@ -139,14 +185,17 @@ class AppController {
         
         // Met à jour l'interface utilisateur principale
         this.uiManager.updateCategoryNav(visibleCategories, currentCategoryId);
-        this.uiManager.updateCategories(visibleCategories, currentCategoryId, isInitialLoad);
         
-        // Version améliorée pour les favoris avec groupes et réorganisation
+        // Passe le paramètre preserveScroll à updateCategories
+        this.uiManager.updateCategories(visibleCategories, currentCategoryId, isInitialLoad, preserveScroll);
+        
+        // Gestion des favoris avec groupes et réorganisation
         this.uiManager.updateFavorites(
             favoritesData, 
-            (appId, categoryId) => this.toggleFavorite(appId, categoryId),
+            (appId, categoryId, targetGroupId) => this.toggleFavorite(appId, categoryId, targetGroupId),
             (groupId, newOrder) => this.reorderGroupFavorites(groupId, newOrder),
-            (action, id, extraId) => this.handleGroupAction(action, id, extraId)
+            (action, id, extraId) => this.handleGroupAction(action, id, extraId),
+            (appId) => this.favoritesModel.isFavorite(appId)
         );
         
         // Met à jour le dock avec les catégories pour la navigation rapide

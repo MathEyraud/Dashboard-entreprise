@@ -492,6 +492,14 @@ class FavoritesModel {
             }
         }
         
+        // NOUVEAU: Trier les applications par nom dans chaque groupe
+        Object.keys(favoriteAppsGrouped).forEach(groupId => {
+            favoriteAppsGrouped[groupId].apps.sort((a, b) => {
+                // Tri alphabétique insensible à la casse
+                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+            });
+        });
+        
         return {
             favoriteAppsGrouped,
             groups: this._groups
