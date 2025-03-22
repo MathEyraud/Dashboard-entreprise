@@ -1,0 +1,491 @@
+/* favorites-group.css - Styles pour les groupes de favoris */
+
+/* Container pour les groupes de favoris */
+.favorites-groups-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+/* Styles pour chaque groupe de favoris */
+.favorites-group {
+    background-color: rgba(var(--color-active-rgb), 0.03);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    border-left: 3px solid var(--color-active);
+    transition: all 0.3s ease;
+}
+
+.dark-mode .favorites-group {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-left-color: var(--color-button-alt);
+}
+
+/* Styles pour les groupes vides */
+.favorites-group-empty {
+    opacity: 0.85;
+    transition: all 0.3s ease;
+    border-left-style: dashed;
+}
+
+.favorites-group-empty:hover {
+    opacity: 1;
+}
+
+/* En-tête du groupe */
+.favorites-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid rgba(var(--color-active-rgb), 0.1);
+}
+
+.dark-mode .favorites-group-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Titre du groupe */
+.favorites-group-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-active);
+    font-size: var(--font-size-md);
+}
+
+.dark-mode .favorites-group-title {
+    color: var(--color-button-alt);
+}
+
+.favorites-group-title i {
+    font-size: var(--font-size-sm);
+}
+
+/* Actions du groupe */
+.favorites-group-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.favorites-group-actions button {
+    background: none;
+    border: none;
+    padding: var(--spacing-xs);
+    cursor: pointer;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-informative);
+    transition: all 0.2s ease;
+}
+
+.favorites-group-actions button:hover {
+    background-color: var(--item-hover);
+    color: var(--text-light);
+}
+
+.favorites-group-edit:hover {
+    color: var(--color-active);
+}
+
+.dark-mode .favorites-group-edit:hover {
+    color: var(--color-button-alt);
+}
+
+.favorites-group-delete:hover {
+    color: var(--color-error);
+}
+
+/* Message pour groupe vide */
+.favorites-empty-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    color: var(--color-informative);
+    text-align: center;
+    background-color: rgba(var(--color-active-rgb), 0.03);
+    border-radius: var(--border-radius-md);
+    border: 2px dashed rgba(var(--color-active-rgb), 0.1);
+    height: 100px;
+    transition: all 0.3s ease;
+}
+
+.dark-mode .favorites-empty-message {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.favorites-empty-message i {
+    font-size: 24px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.favorites-empty-message p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+}
+
+/* Bouton d'ajout de groupe */
+.favorites-add-group-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--color-active);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.favorites-add-group-btn:hover {
+    background-color: var(--color-button);
+    transform: translateY(-2px);
+}
+
+.dark-mode .favorites-add-group-btn {
+    background-color: var(--color-button-alt);
+}
+
+.dark-mode .favorites-add-group-btn:hover {
+    background-color: var(--color-active);
+}
+
+/* Styles pour les tuiles lors du drag and drop */
+.app-tile[draggable="true"] {
+    cursor: grab;
+}
+
+.app-tile.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+.app-grid.drag-active {
+    min-height: 100px;
+    transition: all 0.2s ease;
+}
+
+.app-grid.drag-over {
+    border: 2px solid var(--color-active);
+    border-radius: var(--border-radius-md);
+    background-color: rgba(var(--color-active-rgb), 0.08);
+    padding: var(--spacing-xs);
+    transition: all 0.2s ease;
+}
+
+.dark-mode .app-grid.drag-over {
+    border-color: var(--color-button-alt);
+    background-color: rgba(var(--color-button-alt-rgb), 0.15);
+}
+
+/* Styles améliorés pour le drag-and-drop */
+.drag-target-highlight {
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.drag-target-empty-highlight {
+    opacity: 1;
+    box-shadow: 0 0 0 2px var(--color-active);
+    z-index: 10;
+}
+
+.dark-mode .drag-target-empty-highlight {
+    box-shadow: 0 0 0 2px var(--color-button-alt);
+}
+
+.group-drag-over {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1) !important;
+    z-index: 20;
+    border-color: var(--color-active);
+}
+
+.dark-mode .group-drag-over {
+    border-color: var(--color-button-alt);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Animation pulsatoire pour les groupes vides pendant le drag */
+@keyframes pulse-border {
+    0% {
+        border-color: rgba(var(--color-active-rgb), 0.3);
+    }
+    50% {
+        border-color: var(--color-active);
+    }
+    100% {
+        border-color: rgba(var(--color-active-rgb), 0.3);
+    }
+}
+
+.favorites-group-empty.drag-target-empty-highlight .favorites-empty-message {
+    border-color: var(--color-active);
+    border-width: 2px;
+    animation: pulse-border 1.5s infinite;
+    background-color: rgba(var(--color-active-rgb), 0.08);
+}
+
+.dark-mode .favorites-group-empty.drag-target-empty-highlight .favorites-empty-message {
+    border-color: var(--color-button-alt);
+    background-color: rgba(var(--color-button-alt-rgb), 0.1);
+    animation: none; /* L'animation peut être moins visible en mode sombre */
+}
+
+/* Style spécial pour les groupes vides lors du survol */
+.favorites-group-empty:hover .favorites-empty-message {
+    border-color: rgba(var(--color-active-rgb), 0.3);
+    background-color: rgba(var(--color-active-rgb), 0.05);
+}
+
+.dark-mode .favorites-group-empty:hover .favorites-empty-message {
+    border-color: rgba(var(--color-button-alt-rgb), 0.3);
+    background-color: rgba(var(--color-button-alt-rgb), 0.07);
+}
+
+/* Formulaire de gestion des groupes */
+.group-management-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.group-management-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.group-management-form {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+}
+
+.group-management-header {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.group-management-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+}
+
+.group-management-close {
+    background: none;
+    border: none;
+    font-size: var(--font-size-xl);
+    cursor: pointer;
+    color: var(--color-informative);
+    transition: color 0.2s ease;
+}
+
+.group-management-close:hover {
+    color: var(--color-error);
+}
+
+.group-form-field {
+    margin-bottom: var(--spacing-md);
+}
+
+.group-form-label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+}
+
+.group-form-input {
+    width: 100%;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-md);
+    background-color: var(--card-bg);
+    color: var(--text-light);
+}
+
+.group-form-input:focus {
+    outline: none;
+    border-color: var(--color-active);
+}
+
+.dark-mode .group-form-input:focus {
+    border-color: var(--color-button-alt);
+}
+
+.group-color-select {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+    margin-top: var(--spacing-xs);
+}
+
+.color-option {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.2);
+}
+
+.color-option.selected {
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--color-active);
+}
+
+.dark-mode .color-option.selected {
+    box-shadow: 0 0 0 2px var(--color-button-alt);
+}
+
+.group-icon-select {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+}
+
+.icon-option {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-informative);
+}
+
+.icon-option:hover {
+    background-color: var(--item-hover);
+    color: var(--text-light);
+}
+
+.icon-option.selected {
+    background-color: var(--color-active);
+    color: white;
+}
+
+.dark-mode .icon-option.selected {
+    background-color: var(--color-button-alt);
+}
+
+.group-management-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+}
+
+.group-cancel-btn, .group-save-btn, .group-delete-btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.group-cancel-btn {
+    background-color: var(--card-border);
+    color: var(--text-light);
+    border: none;
+}
+
+.group-cancel-btn:hover {
+    background-color: var(--color-informative);
+    color: white;
+}
+
+.group-save-btn {
+    background-color: var(--color-active);
+    color: white;
+    border: none;
+}
+
+.group-save-btn:hover {
+    background-color: var(--color-button);
+    transform: translateY(-2px);
+}
+
+.dark-mode .group-save-btn {
+    background-color: var(--color-button-alt);
+}
+
+.dark-mode .group-save-btn:hover {
+    background-color: var(--color-active);
+}
+
+.group-delete-btn {
+    background-color: var(--color-error);
+    color: white;
+    border: none;
+}
+
+.group-delete-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .group-icon-select {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    
+    .favorites-add-group-btn {
+        font-size: 0;
+        padding: var(--spacing-xs);
+        width: 32px;
+        height: 32px;
+    }
+    
+    .favorites-add-group-btn i {
+        font-size: var(--font-size-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .group-icon-select {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .group-management-form {
+        max-width: 90%;
+        padding: var(--spacing-md);
+    }
+}

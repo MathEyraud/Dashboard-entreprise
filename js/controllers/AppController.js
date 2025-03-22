@@ -46,6 +46,16 @@ class AppController {
             this.categoryModel,
             () => this.updateDisplay(true)
         );
+
+        /**
+         * Initialisation du gestionnaire de groupes
+         * À ajouter dans le constructeur de l'AppController
+         */
+        // Gestionnaire de groupes de favoris
+        this.favoritesGroupManager = new FavoritesGroupManager(
+            this.favoritesModel,
+            () => this.updateDisplay(true)
+        );
         
         // Configure les écouteurs d'événements
         this._setupEventListeners();
@@ -101,7 +111,8 @@ class AppController {
         if (this.favoritesModel.isFavorite(appId)) {
             this.favoritesModel.removeFavorite(appId);
         } else {
-            this.favoritesModel.addFavorite(appId, categoryId);
+            // Ajouter au groupe "general" par défaut
+            this.favoritesModel.addFavorite(appId, categoryId, 'general');
         }
         
         // Met à jour l'interface
@@ -112,9 +123,9 @@ class AppController {
     }
     
     /**
-     * Met à jour l'affichage
-     * @param {boolean} isInitialLoad - Indique s'il s'agit du chargement initial
-     */
+     * Mise à jour de la méthode updateDisplay
+     * Remplacer la partie des favoris dans la méthode existante
+    */
     updateDisplay(isInitialLoad = false) {
         // Récupère les informations nécessaires
         let categories = this.categoryModel.getOrderedCategories();
@@ -123,14 +134,20 @@ class AppController {
         // Filtre les catégories selon leur visibilité
         const visibleCategories = this.visibilityManager.filterVisibleCategories(categories);
         
-        const favoriteApps = this.favoritesModel.getFavoriteApps(this.categoryModel);
+        // Récupère les favoris groupés
+        const favoritesData = this.favoritesModel.getFavoriteApps(this.categoryModel);
         
         // Met à jour l'interface utilisateur principale
         this.uiManager.updateCategoryNav(visibleCategories, currentCategoryId);
         this.uiManager.updateCategories(visibleCategories, currentCategoryId, isInitialLoad);
-        this.uiManager.updateFavorites(favoriteApps, (appId, categoryId) => {
-            this.toggleFavorite(appId, categoryId);
-        });
+        
+        // Version améliorée pour les favoris avec groupes et réorganisation
+        this.uiManager.updateFavorites(
+            favoritesData, 
+            (appId, categoryId) => this.toggleFavorite(appId, categoryId),
+            (groupId, newOrder) => this.reorderGroupFavorites(groupId, newOrder),
+            (action, id, extraId) => this.handleGroupAction(action, id, extraId)
+        );
         
         // Met à jour le dock avec les catégories pour la navigation rapide
         this.dockManager.updateDockCategories(
@@ -156,5 +173,29 @@ class AppController {
         StorageService.updatePreference('lastVisit', new Date().toISOString());
         
         console.log('Application Dashboard initialisée avec succès');
+    }
+
+    /**
+     * Réorganise les favoris d'un groupe
+     * @param {string} groupId - ID du groupe
+     * @param {Array} newOrder - Nouvel ordre des favoris du groupe
+     */
+    reorderGroupFavorites(groupId, newOrder) {
+        // Appelle la méthode de réorganisation du modèle
+        this.favoritesModel.reorderGroupFavorites(groupId, newOrder);
+        
+        // Met à jour l'interface
+        this.updateDisplay(true);
+    }
+
+    /**
+     * Gère les actions de groupe
+     * @param {string} action - Type d'action (add, edit, delete, moveToGroup)
+     * @param {string} [id=null] - ID du groupe ou de l'app selon l'action
+     * @param {string} [extraId=null] - ID supplémentaire (groupId pour moveToGroup)
+     */
+    handleGroupAction(action, id = null, extraId = null) {
+        // Délègue au gestionnaire de groupes
+        this.favoritesGroupManager.handleGroupAction(action, id, extraId);
     }
 }

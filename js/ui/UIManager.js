@@ -16,6 +16,8 @@ class UIManager {
         // Éléments du DOM
         this.categoriesContainerElement = document.getElementById('categoriesContainer');
         this.favoritesCallback = null;
+        this.reorderCallback = null;
+        this.groupManagementCallback = null;
         
         // État des sections réduites
         this._collapsedSections = {};
@@ -83,23 +85,38 @@ class UIManager {
     }
     
     /**
-     * Met à jour la section des favoris
-     * @param {Array} favoriteApps - Liste des applications favorites
+     * Met à jour la section des favoris avec prise en charge des groupes
+     * @param {Object} favoritesData - Données des favoris (groupées par groupe)
      * @param {Function} favoriteCallback - Fonction à appeler pour basculer les favoris
+     * @param {Function} reorderCallback - Fonction à appeler pour réorganiser les favoris
+     * @param {Function} groupManagementCallback - Fonction à appeler pour gérer les groupes
      */
-    updateFavorites(favoriteApps, favoriteCallback) {
+    updateFavorites(favoritesData, favoriteCallback, reorderCallback, groupManagementCallback) {
         this.favoritesCallback = favoriteCallback;
+        this.reorderCallback = reorderCallback;
+        this.groupManagementCallback = groupManagementCallback;
+        
+        // Récupère les données structurées
+        const { favoriteAppsGrouped, groups } = favoritesData;
+        
+        // Vérifie s'il y a des favoris à afficher
+        const hasFavorites = groups.some(group => 
+            favoriteAppsGrouped[group.id]?.apps.length > 0
+        );
         
         // Cherche si une section de favoris existe déjà
         let favoritesSection = document.getElementById('favorites-section');
         
         // Si la section n'existe pas et qu'il y a des favoris, la créer
-        if (!favoritesSection && favoriteApps.length > 0) {
-            favoritesSection = this._createFavoritesSection(favoriteApps);
+        if (!favoritesSection && hasFavorites) {
+            favoritesSection = this._createFavoritesSection(favoriteAppsGrouped, groups);
             
             // Insérer en haut du container
             if (this.categoriesContainerElement.firstChild) {
-                this.categoriesContainerElement.insertBefore(favoritesSection, this.categoriesContainerElement.firstChild);
+                this.categoriesContainerElement.insertBefore(
+                    favoritesSection, 
+                    this.categoriesContainerElement.firstChild
+                );
             } else {
                 this.categoriesContainerElement.appendChild(favoritesSection);
             }
@@ -107,28 +124,27 @@ class UIManager {
         // Si la section existe, la mettre à jour
         else if (favoritesSection) {
             // Si plus de favoris, supprimer la section
-            if (favoriteApps.length === 0) {
+            if (!hasFavorites) {
                 favoritesSection.remove();
             } else {
                 // Mise à jour du contenu
-                const appGrid = favoritesSection.querySelector('.app-grid');
-                appGrid.innerHTML = '';
-                
-                favoriteApps.forEach(app => {
-                    const appTile = this._createAppTile(app, true);
-                    appGrid.appendChild(appTile);
-                });
+                this._updateFavoritesSectionContent(
+                    favoritesSection, 
+                    favoriteAppsGrouped, 
+                    groups
+                );
             }
         }
     }
     
     /**
-     * Crée la section des favoris
-     * @param {Array} favoriteApps - Liste des applications favorites
+     * Crée la section des favoris avec support des groupes
+     * @param {Object} favoriteAppsGrouped - Applications favorites groupées
+     * @param {Array} groups - Liste des groupes de favoris
      * @returns {HTMLElement} La section créée
      * @private
      */
-    _createFavoritesSection(favoriteApps) {
+    _createFavoritesSection(favoriteAppsGrouped, groups) {
         const section = document.createElement('section');
         section.className = 'category-section favorites-section';
         section.id = 'favorites-section';
@@ -147,30 +163,256 @@ class UIManager {
         title.innerHTML = '<i class="fas fa-star"></i> Favoris';
         headerLeft.appendChild(title);
         
+        // Partie droite de l'en-tête (actions)
+        const headerRight = document.createElement('div');
+        headerRight.className = 'category-header-right';
+        
+        // Bouton d'ajout de groupe
+        const addGroupBtn = document.createElement('button');
+        addGroupBtn.className = 'favorites-add-group-btn';
+        addGroupBtn.innerHTML = '<i class="fas fa-folder-plus"></i> Nouveau groupe';
+        addGroupBtn.setAttribute('title', 'Ajouter un nouveau groupe de favoris');
+        addGroupBtn.addEventListener('click', () => {
+            if (this.groupManagementCallback) {
+                this.groupManagementCallback('add');
+            }
+        });
+        headerRight.appendChild(addGroupBtn);
+        
         header.appendChild(headerLeft);
+        header.appendChild(headerRight);
         section.appendChild(header);
         
         // Description
         const description = document.createElement('p');
         description.className = 'category-description';
-        description.textContent = 'Vos applications favorites pour un accès rapide';
+        description.textContent = 'Vos applications favorites pour un accès rapide. Glissez-déposez pour réorganiser.';
         section.appendChild(description);
         
-        // Grille d'applications
-        const appGrid = document.createElement('div');
-        appGrid.className = 'app-grid';
+        // Conteneur des groupes
+        const groupsContainer = document.createElement('div');
+        groupsContainer.className = 'favorites-groups-container';
+        section.appendChild(groupsContainer);
         
-        // Ajoute chaque application favorite à la grille
-        favoriteApps.forEach(app => {
-            const appTile = this._createAppTile(app, true);
-            appGrid.appendChild(appTile);
-        });
-        
-        section.appendChild(appGrid);
+        // Ajoute chaque groupe de favoris
+        this._populateFavoritesGroups(groupsContainer, favoriteAppsGrouped, groups);
         
         return section;
     }
     
+    /**
+     * Met à jour le contenu de la section des favoris
+     * @param {HTMLElement} favoritesSection - Section des favoris
+     * @param {Object} favoriteAppsGrouped - Applications favorites groupées
+     * @param {Array} groups - Liste des groupes de favoris
+     * @private
+     */
+    _updateFavoritesSectionContent(favoritesSection, favoriteAppsGrouped, groups) {
+        // Trouve ou crée le conteneur des groupes
+        let groupsContainer = favoritesSection.querySelector('.favorites-groups-container');
+        if (!groupsContainer) {
+            groupsContainer = document.createElement('div');
+            groupsContainer.className = 'favorites-groups-container';
+            favoritesSection.appendChild(groupsContainer);
+        }
+        
+        // Vide le conteneur
+        groupsContainer.innerHTML = '';
+        
+        // Remplit avec les groupes mis à jour
+        this._populateFavoritesGroups(groupsContainer, favoriteAppsGrouped, groups);
+    }
+    
+    /**
+     * Remplit le conteneur des groupes de favoris
+     * Version améliorée pour afficher les groupes vides
+     * @param {HTMLElement} groupsContainer - Conteneur des groupes
+     * @param {Object} favoriteAppsGrouped - Applications favorites groupées
+     * @param {Array} groups - Liste des groupes de favoris
+     * @private
+     */
+    _populateFavoritesGroups(groupsContainer, favoriteAppsGrouped, groups) {
+        // Parcourt chaque groupe
+        groups.forEach(group => {
+            const groupData = favoriteAppsGrouped[group.id];
+            const hasApps = groupData && groupData.apps.length > 0;
+            
+            // Crée l'élément de groupe (maintenant tous les groupes sont créés)
+            const groupElement = this._createFavoriteGroup(
+                group, 
+                hasApps ? groupData.apps : [],
+                !hasApps // Passe un indicateur pour les groupes vides
+            );
+            
+            groupsContainer.appendChild(groupElement);
+        });
+    }
+    
+    /**
+     * Crée un élément de groupe de favoris
+     * Version améliorée pour gérer les groupes vides
+     * @param {Object} group - Données du groupe
+     * @param {Array} apps - Applications du groupe
+     * @param {boolean} [isEmpty=false] - Indique si le groupe est vide
+     * @returns {HTMLElement} Élément du groupe
+     * @private
+     */
+    _createFavoriteGroup(group, apps, isEmpty = false) {
+        const groupElement = document.createElement('div');
+        groupElement.className = 'favorites-group';
+        if (isEmpty) {
+            groupElement.classList.add('favorites-group-empty');
+        }
+        groupElement.setAttribute('data-group-id', group.id);
+        
+        // En-tête du groupe
+        const groupHeader = document.createElement('div');
+        groupHeader.className = 'favorites-group-header';
+        
+        // Icône et nom du groupe
+        const groupTitle = document.createElement('div');
+        groupTitle.className = 'favorites-group-title';
+        groupTitle.innerHTML = `<i class="fas fa-${group.icon}" style="color: ${group.color}"></i> ${group.name}`;
+        
+        // Boutons d'action du groupe (sauf pour le groupe général)
+        const groupActions = document.createElement('div');
+        groupActions.className = 'favorites-group-actions';
+        
+        if (group.id !== 'general') {
+            // Bouton d'édition du groupe
+            const editBtn = document.createElement('button');
+            editBtn.className = 'favorites-group-edit';
+            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+            editBtn.setAttribute('title', 'Modifier ce groupe');
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.groupManagementCallback) {
+                    this.groupManagementCallback('edit', group.id);
+                }
+            });
+            groupActions.appendChild(editBtn);
+            
+            // Bouton de suppression du groupe
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'favorites-group-delete';
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            deleteBtn.setAttribute('title', 'Supprimer ce groupe');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.groupManagementCallback) {
+                    this.groupManagementCallback('delete', group.id);
+                }
+            });
+            groupActions.appendChild(deleteBtn);
+        }
+        
+        groupHeader.appendChild(groupTitle);
+        groupHeader.appendChild(groupActions);
+        groupElement.appendChild(groupHeader);
+        
+        // Grille d'applications du groupe
+        const appGrid = document.createElement('div');
+        appGrid.className = 'app-grid';
+        appGrid.setAttribute('data-group-id', group.id);
+        
+        // Si le groupe est vide, afficher un message d'aide
+        if (isEmpty) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'favorites-empty-message';
+            emptyMessage.innerHTML = `
+                <i class="fas fa-arrow-down"></i>
+                <p>Glissez vos applications favorites ici</p>
+            `;
+            appGrid.appendChild(emptyMessage);
+        } else {
+            // Ajoute chaque application au groupe
+            apps.forEach(app => {
+                const appTile = this._createAppTile(app, true, app.categoryId);
+                appGrid.appendChild(appTile);
+            });
+        }
+        
+        groupElement.appendChild(appGrid);
+        
+        // Configure le glisser-déposer pour cette grille de groupe
+        this._setupDragAndDrop(appGrid, group.id);
+        
+        return groupElement;
+    }
+    
+    /**
+     * Configure le glisser-déposer pour un groupe de favoris
+     * Version améliorée avec une meilleure indication visuelle
+     * @param {HTMLElement} container - Conteneur des tuiles
+     * @param {string} groupId - ID du groupe
+     * @private
+     */
+    _setupDragAndDrop(container, groupId) {
+        // Active la possibilité de deposer des éléments dans ce conteneur
+        container.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            // Ajoute un effet visuel pour indiquer la zone de dépôt
+            container.classList.add('drag-over');
+            
+            // Ajoute aussi une classe au groupe parent pour une meilleure visibilité
+            const groupElement = container.closest('.favorites-group');
+            if (groupElement) {
+                groupElement.classList.add('group-drag-over');
+            }
+        });
+        
+        // Gère la sortie de la zone de dépôt
+        container.addEventListener('dragleave', (e) => {
+            // Vérifier si on quitte réellement le conteneur ou juste un élément à l'intérieur
+            // On teste si on va vers un élément qui n'est pas un descendant du conteneur
+            if (!container.contains(e.relatedTarget)) {
+                container.classList.remove('drag-over');
+                
+                // Retirer la classe du groupe parent également
+                const groupElement = container.closest('.favorites-group');
+                if (groupElement) {
+                    groupElement.classList.remove('group-drag-over');
+                }
+            }
+        });
+        
+        // Gère le dépôt d'un élément
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+            container.classList.remove('drag-over');
+            
+            // Retirer la classe du groupe parent également
+            const groupElement = container.closest('.favorites-group');
+            if (groupElement) {
+                groupElement.classList.remove('group-drag-over');
+            }
+            
+            // Récupère les données de l'élément déplacé
+            const appId = e.dataTransfer.getData('application/app-id');
+            const sourceGroupId = e.dataTransfer.getData('application/group-id');
+
+            // On dépose dans un groupe différent
+            if (sourceGroupId !== groupId) {
+                // Si l'élément est déplacé vers un autre groupe, informer le modèle
+                if (this.groupManagementCallback) {
+                    this.groupManagementCallback('moveToGroup', appId, groupId);
+                    return;
+                }
+            }
+            
+            // Sinon, gérer la réorganisation au sein du même groupe
+            const appTiles = Array.from(container.querySelectorAll('.app-tile'));
+            const appIds = appTiles.map(tile => tile.getAttribute('data-app-id'));
+            
+            // Appeler le callback de réorganisation seulement s'il y a des tuiles d'applications
+            if (appIds.length > 0 && this.reorderCallback) {
+                this.reorderCallback(groupId, appIds);
+            }
+        });
+}
+
     /**
      * Met à jour l'affichage de toutes les catégories
      * @param {Array} categories - Liste des catégories ordonnées
@@ -316,7 +558,7 @@ class UIManager {
     }
     
     /**
-     * Crée une tuile d'application
+     * Version améliorée de _createAppTile avec indications drag-and-drop
      * @param {Object} app - Données de l'application
      * @param {boolean} isFavoriteSection - Indique si l'app est dans la section favoris
      * @param {string} categoryId - ID de la catégorie (optionnel si dans favoris)
@@ -338,6 +580,57 @@ class UIManager {
         if (categoryId) {
             tileLink.setAttribute('data-category-id', categoryId);
         }
+        
+        // Si nous sommes dans les favoris, rendre la tuile déplaçable
+        if (isFavoriteSection) {
+            tileLink.setAttribute('draggable', 'true');
+            if (app.groupId) {
+                tileLink.setAttribute('data-group-id', app.groupId);
+            }
+            
+            // Configurons les événements de glisser-déposer
+            tileLink.addEventListener('dragstart', (e) => {
+
+                e.dataTransfer.setData('application/app-id', app.id);
+                e.dataTransfer.setData('application/group-id', app.groupId || 'general');
+                tileLink.classList.add('dragging');
+                
+                // Effet visuel pour tous les conteneurs de favoris
+                document.querySelectorAll('.app-grid[data-group-id]').forEach(grid => {
+                    grid.classList.add('drag-active');
+                });
+                
+                // Activer visuellement tous les groupes pour montrer qu'ils sont des cibles valides
+                document.querySelectorAll('.favorites-group').forEach(group => {
+                    group.classList.add('drag-target-highlight');
+                });
+                
+                // Mettre en évidence particulièrement les groupes vides
+                document.querySelectorAll('.favorites-group-empty').forEach(group => {
+                    group.classList.add('drag-target-empty-highlight');
+                });
+            });
+            
+            tileLink.addEventListener('dragend', () => {
+                tileLink.classList.remove('dragging');
+                
+                // Retirer l'effet visuel de tous les conteneurs
+                document.querySelectorAll('.app-grid[data-group-id]').forEach(grid => {
+                    grid.classList.remove('drag-active');
+                    grid.classList.remove('drag-over');
+                });
+                
+                // Retirer la mise en évidence des groupes
+                document.querySelectorAll('.favorites-group').forEach(group => {
+                    group.classList.remove('drag-target-highlight');
+                });
+                
+                document.querySelectorAll('.favorites-group-empty').forEach(group => {
+                    group.classList.remove('drag-target-empty-highlight');
+                });
+            });
+        }
+
         
         // Amélioration de l'accessibilité : ajout d'un attribut title avec le nom et la description
         let titleText = app.name;
@@ -427,7 +720,8 @@ class UIManager {
         tileLink.appendChild(favoriteButton);
         
         return tileLink;
-    }    
+    }
+    
     /**
      * Fait défiler jusqu'à la catégorie active avec un décalage pour la visibilité du titre
      * @param {string} categoryId - ID de la catégorie active
