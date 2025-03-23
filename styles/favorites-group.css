@@ -1,5 +1,7 @@
 /* favorites-group.css - Styles pour les groupes de favoris */
 
+/* ===== STRUCTURE DE BASE DES GROUPES ===== */
+
 /* Container pour les groupes de favoris */
 .favorites-groups-container {
     display: flex;
@@ -33,6 +35,8 @@
     opacity: 1;
 }
 
+/* ===== EN-TÊTE DE GROUPE ===== */
+
 /* En-tête du groupe */
 .favorites-group-header {
     display: flex;
@@ -64,6 +68,8 @@
 .favorites-group-title i {
     font-size: var(--font-size-sm);
 }
+
+/* ===== ACTIONS DE GROUPE ===== */
 
 /* Actions du groupe */
 .favorites-group-actions {
@@ -103,6 +109,8 @@
     color: var(--color-error);
 }
 
+/* ===== MESSAGE POUR GROUPE VIDE ===== */
+
 /* Message pour groupe vide */
 .favorites-empty-message {
     display: flex;
@@ -134,6 +142,8 @@
     font-size: var(--font-size-sm);
 }
 
+/* ===== BOUTON D'AJOUT DE GROUPE ===== */
+
 /* Bouton d'ajout de groupe */
 .favorites-add-group-btn {
     display: flex;
@@ -162,125 +172,7 @@
     background-color: var(--color-active);
 }
 
-/* Styles améliorés pour le glisser-déposer des applications */
-.app-tile[draggable="true"] {
-    cursor: grab;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.app-tile[draggable="true"]:hover {
-    position: relative;
-    z-index: 10;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.app-tile[draggable="true"]:active {
-    cursor: grabbing;
-}
-
-.app-tile.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-    transform: scale(0.95);
-}
-
-.app-grid.drag-active {
-    min-height: 100px;
-    transition: all 0.2s ease;
-}
-
-/* Effet visuel lorsqu'on survole un groupe pendant le drag */
-.favorites-section .app-grid.drag-over {
-    background-color: rgba(var(--color-active-rgb), 0.1);
-    border: 2px dashed var(--color-active);
-    border-radius: var(--border-radius-md);
-    padding: var(--spacing-sm);
-    min-height: 100px;
-}
-
-.dark-mode .favorites-section .app-grid.drag-over {
-    background-color: rgba(var(--color-button-alt-rgb), 0.15);
-    border-color: var(--color-button-alt);
-}
-
-/* Message d'instruction pendant le drag */
-.favorites-section .app-grid.drag-over::after {
-    content: "Déposer pour ajouter aux favoris";
-    display: block;
-    text-align: center;
-    padding: var(--spacing-md);
-    color: var(--color-active);
-    font-style: italic;
-}
-
-.dark-mode .favorites-section .app-grid.drag-over::after {
-    color: var(--color-button-alt);
-}
-
-/* Styles améliorés pour le drag-and-drop */
-.drag-target-highlight {
-    transform: translateY(0);
-    transition: all 0.3s ease;
-}
-
-.drag-target-empty-highlight {
-    opacity: 1;
-    box-shadow: 0 0 0 2px var(--color-active);
-    z-index: 10;
-}
-
-.dark-mode .drag-target-empty-highlight {
-    box-shadow: 0 0 0 2px var(--color-button-alt);
-}
-
-.group-drag-over {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1) !important;
-    z-index: 20;
-    border-color: var(--color-active);
-}
-
-.dark-mode .group-drag-over {
-    border-color: var(--color-button-alt);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Animation pulsatoire pour les groupes vides pendant le drag */
-@keyframes pulse-border {
-    0% {
-        border-color: rgba(var(--color-active-rgb), 0.3);
-    }
-    50% {
-        border-color: var(--color-active);
-    }
-    100% {
-        border-color: rgba(var(--color-active-rgb), 0.3);
-    }
-}
-
-.favorites-group-empty.drag-target-empty-highlight .favorites-empty-message {
-    border-color: var(--color-active);
-    border-width: 2px;
-    animation: pulse-border 1.5s infinite;
-    background-color: rgba(var(--color-active-rgb), 0.08);
-}
-
-.dark-mode .favorites-group-empty.drag-target-empty-highlight .favorites-empty-message {
-    border-color: var(--color-button-alt);
-    background-color: rgba(var(--color-button-alt-rgb), 0.1);
-    animation: none; /* L'animation peut être moins visible en mode sombre */
-}
-
-/* Style spécial pour les groupes vides lors du survol */
-.favorites-group-empty:hover .favorites-empty-message {
-    border-color: rgba(var(--color-active-rgb), 0.3);
-    background-color: rgba(var(--color-active-rgb), 0.05);
-}
-
-.dark-mode .favorites-group-empty:hover .favorites-empty-message {
-    border-color: rgba(var(--color-button-alt-rgb), 0.3);
-    background-color: rgba(var(--color-button-alt-rgb), 0.07);
-}
+/* ===== FORMULAIRE DE GESTION DES GROUPES ===== */
 
 /* Formulaire de gestion des groupes */
 .group-management-modal {
@@ -487,7 +379,8 @@
     transform: translateY(-2px);
 }
 
-/* Responsive */
+/* ===== ADAPTATIONS RESPONSIVES ===== */
+
 @media (max-width: 768px) {
     .group-icon-select {
         grid-template-columns: repeat(6, 1fr);

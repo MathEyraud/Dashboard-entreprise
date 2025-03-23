@@ -21,6 +21,10 @@ class UIManager {
         
         // État des sections réduites
         this._collapsedSections = {};
+
+        // Configuration des événements globaux de drag-and-drop
+        this._setupGlobalDragEvents();
+        this._setupBackupDragHandlers();
         
         // Vérifie que tous les éléments nécessaires sont présents
         this._checkElements();
@@ -374,15 +378,23 @@ class UIManager {
     }
     
     /**
-     * Configure le glisser-déposer pour un groupe de favoris
+     * Configure le glisser-déposer pour un groupe de favoris avec un retour visuel amélioré
      * @param {HTMLElement} container - Conteneur des tuiles
      * @param {string} groupId - ID du groupe
      * @private
      */
     _setupDragAndDrop(container, groupId) {
-
         // Stocker l'ID du groupe cible dans une variable locale
         const targetGroupId = groupId;
+
+        // Ajouter la classe de base qui indique une zone cible potentielle
+        container.classList.add('potential-drop-target');
+
+        // Ajouter un indicateur de dépôt
+        const dropIndicator = document.createElement('div');
+        dropIndicator.className = 'drop-indicator';
+        dropIndicator.textContent = 'Déposer ici';
+        container.appendChild(dropIndicator);
 
         // Active la possibilité de déposer des éléments dans ce conteneur
         container.addEventListener('dragover', (e) => {
@@ -416,6 +428,8 @@ class UIManager {
         // Gère le dépôt d'un élément
         container.addEventListener('drop', (e) => {
             e.preventDefault();
+            e.stopPropagation(); // Empêcher la propagation
+            console.log('Item dropped in container');
             container.classList.remove('drag-over');
             
             // Retirer la classe du groupe parent également
@@ -423,6 +437,11 @@ class UIManager {
             if (groupElement) {
                 groupElement.classList.remove('group-drag-over');
             }
+
+            // Forcer un nettoyage global
+            setTimeout(() => {
+                this._handleGlobalDragEnd();
+            }, 50);
             
             // Récupère les données de l'élément déplacé
             const appId = e.dataTransfer.getData('application/app-id');
@@ -460,7 +479,6 @@ class UIManager {
             else if (sourceGroupId !== targetGroupId) {
                 // Passer le groupe source comme paramètre additionnel pour le déplacement
                 if (this.groupManagementCallback) {
-                    console.log("test");
                     this.groupManagementCallback('moveToGroup', appId, targetGroupId, sourceGroupId);
                 }
             }
@@ -475,9 +493,12 @@ class UIManager {
                     this.reorderCallback(targetGroupId, appIds);
                 }
             }
+
+            // Ajouter après le traitement du drop dans l'écouteur
+            this._applyDropAnimation(container);
         });
     }
-
+    
     /**
      * Met à jour l'affichage de toutes les catégories
      * @param {Array} categories - Liste des catégories ordonnées
@@ -659,7 +680,7 @@ class UIManager {
             tileLink.setAttribute('data-group-id', currentGroupId);
         }
         
-        // Configurons les événements de glisser-déposer pour toutes les tuiles
+        // Dans la méthode _createAppTile de la classe UIManager, remplacez le gestionnaire dragstart existant
         tileLink.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('application/app-id', app.id);
             e.dataTransfer.setData('application/category-id', categoryId || '');
@@ -675,21 +696,8 @@ class UIManager {
             // Ajouter la classe dragging à la tuile en cours de déplacement
             tileLink.classList.add('dragging');
             
-            // IMPORTANT: Effet visuel pour tous les conteneurs de favoris
-            // Cette partie est essentielle pour montrer à l'utilisateur où il peut déposer l'application
-            document.querySelectorAll('.app-grid[data-group-id]').forEach(grid => {
-                grid.classList.add('drag-active');
-            });
-            
-            // Activer visuellement tous les groupes pour montrer qu'ils sont des cibles valides
-            document.querySelectorAll('.favorites-group').forEach(group => {
-                group.classList.add('drag-target-highlight');
-            });
-            
-            // Mettre en évidence particulièrement les groupes vides
-            document.querySelectorAll('.favorites-group-empty').forEach(group => {
-                group.classList.add('drag-target-empty-highlight');
-            });
+            // Les autres classes sont maintenant gérées par _setupGlobalDragEvents
+            // via la classe body.dragging-active
         });
         
         tileLink.addEventListener('dragend', () => {
@@ -836,7 +844,173 @@ class UIManager {
             }
         }, 100);
     }
-    
+
+    /**
+     * Configure les écouteurs d'événements au niveau du document pour le drag-and-drop
+     * @private
+     */
+    _setupGlobalDragEvents() {
+        // Écouteur global pour détecter le début d'une opération de glisser-déposer
+        document.addEventListener('dragstart', () => {
+            console.log('Drag started - global handler');
+            // Ajouter une classe au body pour indiquer qu'un drag est en cours
+            document.body.classList.add('dragging-active');
+            
+            // Identifier toutes les zones cibles potentielles immédiatement
+            document.querySelectorAll('.app-grid[data-group-id]').forEach(grid => {
+                if (!grid.classList.contains('potential-drop-target')) {
+                    grid.classList.add('potential-drop-target');
+                }
+            });
+            
+            // Identifier clairement les groupes vides
+            document.querySelectorAll('.favorites-group-empty').forEach(group => {
+                group.classList.add('drag-target-highlight');
+            });
+        });
+        
+        // Écouteur global pour la fin d'un drag
+        document.addEventListener('dragend', this._handleGlobalDragEnd.bind(this));
+        
+        // Écouteur de sécurité sur document pour s'assurer que le drag est réinitialisé
+        document.addEventListener('mouseup', () => {
+            if (document.body.classList.contains('dragging-active')) {
+                console.log('Mouse up detected while dragging - cleanup triggered');
+                this._handleGlobalDragEnd();
+            }
+        });
+        
+        // Écouteur supplémentaire sur document
+        document.addEventListener('click', () => {
+            // Vérifier si une opération de drag semble être en cours alors qu'elle ne devrait pas
+            if (document.body.classList.contains('dragging-active') && 
+                !document.querySelector('.dragging')) {
+                console.log('Click detected while interface shows dragging - cleanup triggered');
+                this._handleGlobalDragEnd();
+            }
+        });
+    }
+
+    /**
+     * Gère la fin d'une opération de drag and drop au niveau global
+     * Cette méthode séparée permet d'être appelée de différents endroits
+     * @private
+     */
+    _handleGlobalDragEnd() {
+        console.log('Drag ended - cleaning up');
+        
+        // Retirer la classe du body
+        document.body.classList.remove('dragging-active');
+        
+        // Nettoyer toutes les classes liées au drag-and-drop
+        document.querySelectorAll('.drag-over, .drag-active, .dragging, .drag-target-highlight').forEach(element => {
+            element.classList.remove('drag-over', 'drag-active', 'dragging', 'drag-target-highlight');
+        });
+        
+        // Réinitialiser complètement les bordures et les styles
+        document.querySelectorAll('.potential-drop-target').forEach(target => {
+            // Garder la classe pour de futures opérations mais réinitialiser les styles visuels
+            target.style.borderColor = '';
+            target.style.boxShadow = '';
+            target.style.transform = '';
+        });
+        
+        // Réinitialiser également les groupes
+        document.querySelectorAll('.favorites-group').forEach(group => {
+            group.classList.remove('group-drag-over');
+        });
+    }
+
+    /**
+     * Initialise les écouteurs de secours pour le drag and drop
+     * Doit être appelé dans le constructeur après _setupGlobalDragEvents
+     * @private
+     */
+    _setupBackupDragHandlers() {
+        // Écouteur de secours au niveau de la fenêtre
+        window.addEventListener('blur', () => {
+            // Si la fenêtre perd le focus pendant un drag, on nettoie
+            if (document.body.classList.contains('dragging-active')) {
+                console.log('Window lost focus during drag - cleanup triggered');
+                this._handleGlobalDragEnd();
+            }
+        });
+        
+        // Écouteur sur Escape pour annuler l'opération de drag
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.body.classList.contains('dragging-active')) {
+                console.log('Escape pressed during drag - cleanup triggered');
+                this._handleGlobalDragEnd();
+            }
+        });
+    }
+
+    /**
+     * S'assure qu'un élément a un indicateur de dépôt
+     * @param {HTMLElement} element - L'élément auquel ajouter un indicateur
+     * @private
+     */
+    _ensureDropIndicator(element) {
+        // Vérifier si l'élément a déjà un indicateur
+        if (!element.querySelector('.drop-indicator')) {
+            const dropIndicator = document.createElement('div');
+            dropIndicator.className = 'drop-indicator temp-drop-indicator';
+            dropIndicator.textContent = 'Déposer ici';
+            element.appendChild(dropIndicator);
+        }
+    }
+
+    /**
+     * Retire la mise en évidence de toutes les zones de dépôt
+     * @private
+     */
+    _removeAllDropTargetsHighlight() {
+        // Retirer toutes les classes liées au drag-and-drop
+        const classesToRemove = [
+            'potential-drop-container', 
+            'potential-drop-target',
+            'drag-over', 
+            'drag-active', 
+            'dragging',
+            'drag-target-highlight',
+            'drag-target-empty-highlight',
+            'group-drag-over'
+        ];
+        
+        classesToRemove.forEach(className => {
+            document.querySelectorAll(`.${className}`).forEach(element => {
+                element.classList.remove(className);
+            });
+        });
+        
+        // Réinitialiser les styles directs qui ont pu être appliqués
+        document.querySelectorAll('.favorites-empty-message').forEach(message => {
+            message.style.borderStyle = '';
+            message.style.borderWidth = '';
+        });
+        
+        // Supprimer les indicateurs de dépôt temporaires
+        document.querySelectorAll('.temp-drop-indicator').forEach(indicator => {
+            indicator.remove();
+        });
+    }
+
+    /**
+     * Applique une animation de rebond lorsqu'un élément est déposé
+     * @param {HTMLElement} targetElement - Élément dans lequel l'élément a été déposé
+     */
+    _applyDropAnimation(targetElement) {
+        if (!targetElement) return;
+        
+        // Appliquer la classe d'animation
+        targetElement.classList.add('drop-animation');
+        
+        // Retirer la classe après la fin de l'animation
+        setTimeout(() => {
+            targetElement.classList.remove('drop-animation');
+        }, 300); // La durée de l'animation est de 300ms
+    }
+
     /**
      * Met à jour les onglets de navigation
      * @param {string} categoryId - ID de la catégorie active

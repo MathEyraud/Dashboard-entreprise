@@ -68,14 +68,8 @@ class AppController {
     _setupEventListeners() {
         // Écouteur pour le changement de catégorie via l'UI normale
         this.uiManager.setupEventListeners(
-            // Callback pour le changement de catégorie
-            (categoryId) => {
-                this.changeCategory(categoryId);
-            },
-            // Callback pour vérifier si une app est en favoris
-            (appId) => {
-                return this.favoritesModel.isFavorite(appId);
-            }
+            (categoryId) => this.changeCategory(categoryId), // Callback pour le changement de catégorie
+            (appId) => this.favoritesModel.isFavorite(appId) // Callback pour vérifier si une app est en favoris
         );
         
         // Écouteur pour les changements de disposition d'affichage

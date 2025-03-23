@@ -103,8 +103,8 @@
 
 .display-toggle-button {
     position: fixed;
-    right: 5%;
-    bottom: 5%;
+    right: 50px;
+    bottom: 50px;
     background-color: var(--color-active);
     color: white;
     border: none;
