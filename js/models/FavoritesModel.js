@@ -190,12 +190,34 @@ class FavoritesModel {
     }
     
     /**
-     * Vérifie si une application est dans les favoris
+     * Vérifie si une application est dans les favoris (dans n'importe quel groupe)
      * @param {string} appId - ID de l'application
      * @returns {boolean} true si l'application est dans les favoris
      */
     isFavorite(appId) {
         return this._favorites.some(fav => fav.id === appId);
+    }
+    
+    /**
+     * Vérifie si une application est dans un groupe spécifique de favoris
+     * @param {string} appId - ID de l'application
+     * @param {string} groupId - ID du groupe
+     * @returns {boolean} true si l'application est dans le groupe spécifié
+     */
+    isInFavoriteGroup(appId, groupId) {
+        if (!appId || !groupId) {
+            console.warn('isInFavoriteGroup appelé avec des paramètres invalides', { appId, groupId });
+            return false;
+        }
+        
+        // Normaliser l'ID de groupe pour les comparaisons
+        const normalizedGroupId = groupId || 'general';
+        
+        // Rechercher dans les favoris
+        return this._favorites.some(fav => 
+            fav.id === appId && 
+            (fav.groupId === normalizedGroupId || (!fav.groupId && normalizedGroupId === 'general'))
+        );
     }
     
     /**
@@ -219,12 +241,12 @@ class FavoritesModel {
      * @returns {boolean} true si l'ajout a réussi
      */
     addFavorite(appId, categoryId, groupId = 'general') {
-        // Vérifie si l'application est déjà dans les favoris
-        if (this.isFavorite(appId)) {
+        // Vérifie si l'application est déjà dans le groupe spécifié
+        if (this.isInFavoriteGroup(appId, groupId)) {
             return false;
         }
         
-        // Ajoute l'application aux favoris
+        // Ajoute l'application aux favoris dans le groupe spécifié
         this._favorites.push({ id: appId, categoryId, groupId });
         
         // Sauvegarde les favoris
@@ -232,46 +254,102 @@ class FavoritesModel {
     }
     
     /**
-     * Supprime une application des favoris
+     * Supprime une application des favoris de tous les groupes
      * @param {string} appId - ID de l'application
      * @returns {boolean} true si la suppression a réussi
      */
     removeFavorite(appId) {
-        // Vérifie si l'application est dans les favoris
-        if (!this.isFavorite(appId)) {
-            return false;
-        }
+        const initialLength = this._favorites.length;
         
         // Filtre les favoris pour retirer l'application
         this._favorites = this._favorites.filter(fav => fav.id !== appId);
         
-        // Sauvegarde les favoris
-        return this._saveFavorites();
-    }
-    
-    /**
-     * Change le groupe d'un favori
-     * @param {string} appId - ID de l'application
-     * @param {string} newGroupId - Nouvel ID de groupe
-     * @returns {boolean} true si le changement a réussi
-     */
-    changeFavoriteGroup(appId, newGroupId) {
-
-        // Vérifie si l'application est dans les favoris
-        if (!this.isFavorite(appId)) {
-            return false;
-        }
-        
-        // Trouve et met à jour le favori
-        const favorite = this._favorites.find(fav => fav.id === appId);
-        if (favorite) {
-            favorite.groupId = newGroupId;
-            
+        // Vérifie si des changements ont été effectués
+        if (initialLength !== this._favorites.length) {
             // Sauvegarde les favoris
             return this._saveFavorites();
         }
         
         return false;
+    }
+    
+    /**
+     * Supprime une application d'un groupe spécifique de favoris
+     * @param {string} appId - ID de l'application
+     * @param {string} groupId - ID du groupe
+     * @returns {boolean} true si la suppression a réussi
+     */
+    removeFromGroup(appId, groupId) {
+        const initialLength = this._favorites.length;
+        
+        // Filtre les favoris pour retirer l'application uniquement du groupe spécifié
+        this._favorites = this._favorites.filter(fav => 
+            !(fav.id === appId && 
+              (fav.groupId === groupId || (!fav.groupId && groupId === 'general')))
+        );
+        
+        // Vérifie si des changements ont été effectués
+        if (initialLength !== this._favorites.length) {
+            // Sauvegarde les favoris
+            return this._saveFavorites();
+        }
+        
+        return false;
+    }
+
+    /**
+     * Change le groupe d'un favori (déplacement au lieu de duplication)
+     * @param {string} appId - ID de l'application
+     * @param {string} newGroupId - Nouvel ID de groupe
+     * @param {string} sourceGroupId - ID du groupe source (optionnel)
+     * @returns {boolean} true si le changement a réussi
+     */
+    changeFavoriteGroup(appId, newGroupId, sourceGroupId = null) {
+
+        // Vérifie si l'application est déjà dans le nouveau groupe
+        if (this.isInFavoriteGroup(appId, newGroupId)) {
+            return false;
+        }
+        
+        // Trouve l'instance de l'application dans le groupe source pour obtenir son categoryId
+        let sourceInstance = null;
+        
+        if (sourceGroupId) {
+            // Chercher dans le groupe source spécifié
+            sourceInstance = this._favorites.find(fav => 
+                fav.id === appId && 
+                (fav.groupId === sourceGroupId || (!fav.groupId && sourceGroupId === 'general'))
+            );
+
+        } else {
+            // Chercher n'importe quelle instance
+            sourceInstance = this._favorites.find(fav => fav.id === appId);
+        }
+        
+        if (!sourceInstance) {
+            return false; // L'application n'existe pas dans les favoris
+        }
+        
+        // Récupère la catégorie de l'application
+        const categoryId = sourceInstance.categoryId;
+        
+        // Supprime l'application du groupe source
+        if (sourceGroupId) {
+            this._favorites = this._favorites.filter(fav => 
+                !(fav.id === appId && 
+                (fav.groupId === sourceGroupId || (!fav.groupId && sourceGroupId === 'general')))
+            );
+        }
+        
+        // Ajoute l'application au nouveau groupe
+        this._favorites.push({
+            id: appId,
+            categoryId: categoryId,
+            groupId: newGroupId
+        });
+        
+        // Sauvegarde les favoris
+        return this._saveFavorites();
     }
     
     /**
@@ -323,7 +401,7 @@ class FavoritesModel {
         // Pour chaque ID dans le nouvel ordre, récupère le favori correspondant
         for (const id of newOrder) {
             const favorite = this._favorites.find(fav => 
-                fav.id === id && (fav.groupId || 'general') === groupId
+                fav.id === id && (fav.groupId === groupId || (!fav.groupId && groupId === 'general'))
             );
             if (favorite) {
                 reorderedGroupFavorites.push(favorite);
@@ -332,7 +410,7 @@ class FavoritesModel {
         
         // S'assure que tous les favoris du groupe sont inclus
         const groupFavorites = this._favorites.filter(fav => 
-            (fav.groupId || 'general') === groupId
+            (fav.groupId === groupId || (!fav.groupId && groupId === 'general'))
         );
         
         for (const favorite of groupFavorites) {

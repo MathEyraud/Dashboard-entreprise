@@ -113,20 +113,20 @@ class AppController {
         // Sauvegarde la position de défilement actuelle
         const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
         
-        // Détermine si l'application était déjà en favoris
-        const wasInFavorites = this.favoritesModel.isFavorite(appId);
+        // Détermine si l'application était déjà en favoris dans le groupe spécifique
+        const wasInGroup = this.favoritesModel.isInFavoriteGroup(appId, targetGroupId);
         
         // NOUVEAU: Mise à jour visuelle immédiate du bouton sans recharger l'interface
         if (sourceElement && sourceElement.classList.contains('app-favorite-toggle')) {
             // Mettre à jour l'apparence du bouton immédiatement
-            if (wasInFavorites) {
-                // Si on retire des favoris
+            if (wasInGroup) {
+                // Si on retire des favoris du groupe
                 sourceElement.innerHTML = '<i class="far fa-star"></i>';
                 sourceElement.setAttribute('title', 'Ajouter aux favoris');
                 sourceElement.setAttribute('aria-label', 'Ajouter aux favoris');
                 sourceElement.classList.remove('is-favorite');
             } else {
-                // Si on ajoute aux favoris
+                // Si on ajoute aux favoris du groupe
                 sourceElement.innerHTML = '<i class="fas fa-star"></i>';
                 sourceElement.setAttribute('title', 'Retirer des favoris');
                 sourceElement.setAttribute('aria-label', 'Retirer des favoris');
@@ -134,20 +134,12 @@ class AppController {
             }
         }
         
-        // Modification du modèle de données comme avant
-        if (targetGroupId !== 'general') {
-            // Si un groupe cible est spécifié (drag & drop)
-            if (wasInFavorites) {
-                this.favoritesModel.removeFavorite(appId);
-            }
-            this.favoritesModel.addFavorite(appId, categoryId, targetGroupId);
+        if (wasInGroup) {
+            // Si l'application est déjà dans ce groupe, la retirer
+            this.favoritesModel.removeFromGroup(appId, targetGroupId);
         } else {
-            // Comportement standard du clic sur l'étoile
-            if (wasInFavorites) {
-                this.favoritesModel.removeFavorite(appId);
-            } else {
-                this.favoritesModel.addFavorite(appId, categoryId, 'general');
-            }
+            // Sinon, l'ajouter au groupe cible
+            this.favoritesModel.addFavorite(appId, categoryId, targetGroupId);
         }
         
         // Reconstruire l'index de recherche car les favoris ont changé
@@ -192,22 +184,19 @@ class AppController {
         // Gestion des favoris avec groupes et réorganisation
         this.uiManager.updateFavorites(
             favoritesData, 
-            (appId, categoryId, targetGroupId) => this.toggleFavorite(appId, categoryId, targetGroupId),
+            (appId, categoryId, targetGroupId, sourceElement) => this.toggleFavorite(appId, categoryId, targetGroupId, sourceElement),
             (groupId, newOrder) => this.reorderGroupFavorites(groupId, newOrder),
-            (action, id, extraId) => this.handleGroupAction(action, id, extraId),
-            (appId) => this.favoritesModel.isFavorite(appId)
+            (action, id, extraId, sourceGroupId) => this.handleGroupAction(action, id, extraId, sourceGroupId),
+            (appId) => this.favoritesModel.isFavorite(appId),
+            (appId, categoryId, groupId) => this.addToFavorites(appId, categoryId, groupId)
         );
         
         // Met à jour le dock avec les catégories pour la navigation rapide
         this.dockManager.updateDockCategories(
             categories, // Toutes les catégories pour le panneau de configuration
             currentCategoryId, 
-            (categoryId) => {
-                this.changeCategory(categoryId);
-            },
-            () => {
-                this.visibilityManager.togglePanel();
-            }
+            (categoryId) => this.changeCategory(categoryId),
+            () => this.visibilityManager.togglePanel()
         );
     }
     
@@ -242,9 +231,10 @@ class AppController {
      * @param {string} action - Type d'action (add, edit, delete, moveToGroup)
      * @param {string} [id=null] - ID du groupe ou de l'app selon l'action
      * @param {string} [extraId=null] - ID supplémentaire (groupId pour moveToGroup)
-     */
-    handleGroupAction(action, id = null, extraId = null) {
-        // Délègue au gestionnaire de groupes
-        this.favoritesGroupManager.handleGroupAction(action, id, extraId);
+     * @param {string} [sourceGroupId=null] - ID du groupe source pour moveToGroup
+    */
+    handleGroupAction(action, id = null, extraId = null, sourceGroupId = null) {
+        // Délègue au gestionnaire de groupes en passant le paramètre sourceGroupId
+        this.favoritesGroupManager.handleGroupAction(action, id, extraId, sourceGroupId);
     }
 }

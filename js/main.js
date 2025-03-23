@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         // Crée et initialise le contrôleur principal
         const app = new AppController();
+
+        // Rendre l'instance accessible globalement pour les vérifications inter-composants
+        window.appController = app;
+        
         app.init();
         
     } catch (error) {

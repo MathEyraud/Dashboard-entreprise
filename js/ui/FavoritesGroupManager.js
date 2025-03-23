@@ -401,8 +401,9 @@ class FavoritesGroupManager {
      * @param {string} action - Type d'action (add, edit, delete, moveToGroup)
      * @param {string} [id=null] - ID du groupe ou de l'app selon l'action
      * @param {string} [extraId=null] - ID supplémentaire (groupId pour moveToGroup)
+     * @param {string} [sourceGroupId=null] - ID du groupe source pour moveToGroup
      */
-    handleGroupAction(action, id = null, extraId = null) {
+    handleGroupAction(action, id = null, extraId = null, sourceGroupId = null) {
 
         switch (action) {
             case 'add':
@@ -424,7 +425,8 @@ class FavoritesGroupManager {
             
             case 'moveToGroup':
                 if (id && extraId) {
-                    this._favoritesModel.changeFavoriteGroup(id, extraId);
+                    // Passer le groupe source comme troisième paramètre
+                    this._favoritesModel.changeFavoriteGroup(id, extraId, sourceGroupId);
                     if (this._updateCallback) {
                         this._updateCallback();
                     }

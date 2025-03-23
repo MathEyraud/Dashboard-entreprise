@@ -91,9 +91,9 @@ class UIManager {
      * @param {Function} reorderCallback - Fonction à appeler pour réorganiser les favoris
      * @param {Function} groupManagementCallback - Fonction à appeler pour gérer les groupes
      * @param {Function} favoritesCheckCallback - Fonction pour vérifier si une app est en favoris
-     * @param {Function} addToFavoritesCallback - Fonction pour ajouter directement aux favoris (nouveau)
+     * @param {Function} [addToFavoritesCallback=null] - Fonction pour ajouter directement aux favoris (optionnel)
      */
-    updateFavorites(favoritesData, favoriteCallback, reorderCallback, groupManagementCallback, favoritesCheckCallback, addToFavoritesCallback) {
+    updateFavorites(favoritesData, favoriteCallback, reorderCallback, groupManagementCallback, favoritesCheckCallback, addToFavoritesCallback = null) {
         this.favoritesCallback = favoriteCallback;
         this.reorderCallback = reorderCallback;
         this.groupManagementCallback = groupManagementCallback;
@@ -170,48 +170,6 @@ class UIManager {
         }, 0);
     }
 
-    /**
-     * Met à jour l'affichage global de l'application
-     * @param {boolean} isInitialLoad - Indique s'il s'agit du chargement initial
-     * @param {boolean} preserveScroll - Indique s'il faut préserver la position de défilement
-     */
-    updateDisplay(isInitialLoad = false, preserveScroll = false) {
-        // Récupère les informations nécessaires
-        let categories = this.categoryModel.getOrderedCategories();
-        const currentCategoryId = this.categoryModel.getCurrentCategoryId();
-        
-        // Filtre les catégories selon leur visibilité
-        const visibleCategories = this.visibilityManager.filterVisibleCategories(categories);
-        
-        // Récupère les favoris groupés
-        const favoritesData = this.favoritesModel.getFavoriteApps(this.categoryModel);
-        
-        // Met à jour l'interface utilisateur principale
-        this.uiManager.updateCategoryNav(visibleCategories, currentCategoryId);
-        this.uiManager.updateCategories(visibleCategories, currentCategoryId, isInitialLoad, preserveScroll);
-        
-        this.uiManager.updateFavorites(
-            favoritesData, 
-            (appId, categoryId, targetGroupId, sourceElement) => this.toggleFavorite(appId, categoryId, targetGroupId, sourceElement),
-            (groupId, newOrder) => this.reorderGroupFavorites(groupId, newOrder),
-            (action, id, extraId) => this.handleGroupAction(action, id, extraId),
-            (appId) => this.favoritesModel.isFavorite(appId),
-            (appId, categoryId, groupId) => this.addToFavorites(appId, categoryId, groupId)
-        );
-        
-        // Met à jour le dock avec les catégories pour la navigation rapide
-        this.dockManager.updateDockCategories(
-            categories,
-            currentCategoryId, 
-            (categoryId) => {
-                this.changeCategory(categoryId);
-            },
-            () => {
-                this.visibilityManager.togglePanel();
-            }
-        );
-    }
-    
     /**
      * Crée la section des favoris avec support des groupes
      * @param {Object} favoriteAppsGrouped - Applications favorites groupées
@@ -472,6 +430,24 @@ class UIManager {
             const isFavorite = e.dataTransfer.getData('application/is-favorite') === 'true';
             const sourceGroupId = e.dataTransfer.getData('application/group-id');
 
+            // Vérifier si l'application est déjà dans le groupe cible
+            // Si c'est le cas et qu'on fait un drag & drop depuis une section non-favoris, ne rien faire
+            if (!isFavorite && this.favoritesCheckCallback) {
+                try {
+                    const appAlreadyInGroup = window.appController && 
+                                            window.appController.favoritesModel && 
+                                            window.appController.favoritesModel.isInFavoriteGroup(appId, targetGroupId);
+                    
+                    if (appAlreadyInGroup) {
+                        console.log(`L'application ${appId} est déjà dans le groupe ${targetGroupId}, aucune action nécessaire.`);
+                        return; // On sort de la fonction sans rien faire
+                    }
+                } catch (error) {
+                    console.warn("Impossible de vérifier si l'application est déjà dans le groupe", error);
+                    // En cas d'erreur, on continue avec le comportement standard
+                }
+            }
+
             // Si l'app n'est pas encore un favori (vient d'une section normale)
             if (!isFavorite) {
                 // Utiliser directement favoritesCallback
@@ -481,10 +457,11 @@ class UIManager {
                 }
             }
             // Si l'app est déjà un favori (déplacement entre groupes)
-            else if (sourceGroupId !== groupId) {
-                // Utiliser le callback de gestion de groupe
+            else if (sourceGroupId !== targetGroupId) {
+                // Passer le groupe source comme paramètre additionnel pour le déplacement
                 if (this.groupManagementCallback) {
-                    this.groupManagementCallback('moveToGroup', appId, groupId);
+                    console.log("test");
+                    this.groupManagementCallback('moveToGroup', appId, targetGroupId, sourceGroupId);
                 }
             }
             // Si c'est une réorganisation au sein du même groupe
@@ -495,7 +472,7 @@ class UIManager {
                 
                 // Mettre à jour l'ordre
                 if (appIds.length > 0 && this.reorderCallback) {
-                    this.reorderCallback(groupId, appIds);
+                    this.reorderCallback(targetGroupId, appIds);
                 }
             }
         });
@@ -677,8 +654,9 @@ class UIManager {
         tileLink.setAttribute('draggable', 'true');
         
         // Si nous sommes dans les favoris, ajouter l'attribut de groupe
-        if (isFavoriteSection && app.groupId) {
-            tileLink.setAttribute('data-group-id', app.groupId);
+        const currentGroupId = isFavoriteSection && app.groupId ? app.groupId : 'general';
+        if (isFavoriteSection) {
+            tileLink.setAttribute('data-group-id', currentGroupId);
         }
         
         // Configurons les événements de glisser-déposer pour toutes les tuiles
@@ -689,14 +667,16 @@ class UIManager {
             // Si dans la section favoris, ajoutons l'information du groupe
             if (isFavoriteSection) {
                 e.dataTransfer.setData('application/is-favorite', 'true');
-                e.dataTransfer.setData('application/group-id', app.groupId || 'general');
+                e.dataTransfer.setData('application/group-id', currentGroupId);
             } else {
                 e.dataTransfer.setData('application/is-favorite', 'false');
             }
             
+            // Ajouter la classe dragging à la tuile en cours de déplacement
             tileLink.classList.add('dragging');
             
-            // Effet visuel pour tous les conteneurs de favoris
+            // IMPORTANT: Effet visuel pour tous les conteneurs de favoris
+            // Cette partie est essentielle pour montrer à l'utilisateur où il peut déposer l'application
             document.querySelectorAll('.app-grid[data-group-id]').forEach(grid => {
                 grid.classList.add('drag-active');
             });
@@ -710,10 +690,10 @@ class UIManager {
             document.querySelectorAll('.favorites-group-empty').forEach(group => {
                 group.classList.add('drag-target-empty-highlight');
             });
-
         });
         
         tileLink.addEventListener('dragend', () => {
+            // Retirer la classe dragging
             tileLink.classList.remove('dragging');
             
             // Retirer l'effet visuel de tous les conteneurs
@@ -747,7 +727,6 @@ class UIManager {
         
         tileLink.setAttribute('title', titleText);
         
-        // Reste de la méthode inchangé...
         // Icône de l'application
         const iconElement = document.createElement('div');
         iconElement.className = 'app-icon';
@@ -780,22 +759,26 @@ class UIManager {
         favoriteButton.className = 'app-favorite-toggle';
         favoriteButton.type = 'button';
         
-        // Détermine si l'app est déjà en favori
-        let isFavorite = isFavoriteSection;
+        // Détermine si l'app est déjà en favori dans ce groupe spécifique
+        let isFavoriteInGroup = isFavoriteSection;
         
-        // Si nous ne sommes pas dans la section favoris, vérifions si l'app est en favoris
+        // Si nous ne sommes pas dans la section favoris, vérifier si l'app est en favoris
         if (!isFavoriteSection && this.favoritesCheckCallback) {
-            isFavorite = this.favoritesCheckCallback(app.id);
+            // Vérifier si l'application est dans les favoris, section générale
+            const isAnyFavorite = this.favoritesCheckCallback(app.id);
+            
+            // Dans une tuile normale, l'étoile indique si l'app est dans les favoris généraux
+            isFavoriteInGroup = isAnyFavorite;
         }
         
-        favoriteButton.setAttribute('aria-label', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
-        favoriteButton.setAttribute('title', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
-        favoriteButton.innerHTML = isFavorite ? 
+        favoriteButton.setAttribute('aria-label', isFavoriteInGroup ? 'Retirer des favoris' : 'Ajouter aux favoris');
+        favoriteButton.setAttribute('title', isFavoriteInGroup ? 'Retirer des favoris' : 'Ajouter aux favoris');
+        favoriteButton.innerHTML = isFavoriteInGroup ? 
             '<i class="fas fa-star"></i>' : 
             '<i class="far fa-star"></i>';
             
         // Si elle est en favoris, ajouter une classe pour le style
-        if (isFavorite) {
+        if (isFavoriteInGroup) {
             favoriteButton.classList.add('is-favorite');
         }
         
@@ -807,8 +790,10 @@ class UIManager {
             if (this.favoritesCallback) {
                 const appId = app.id;
                 const catId = categoryId || app.categoryId;
-                // Passer le bouton lui-même (e.target) comme quatrième paramètre
-                this.favoritesCallback(appId, catId, 'general', favoriteButton);
+                // Passer le groupe courant ou "general" pour les tuiles normales
+                const groupId = isFavoriteSection ? currentGroupId : 'general';
+                // Passer le bouton lui-même comme quatrième paramètre
+                this.favoritesCallback(appId, catId, groupId, favoriteButton);
             }
         });
         
@@ -823,7 +808,7 @@ class UIManager {
         tileLink.appendChild(favoriteButton);
         
         return tileLink;
-    }
+    }    
     
     /**
      * Fait défiler jusqu'à la catégorie active avec un décalage pour la visibilité du titre
