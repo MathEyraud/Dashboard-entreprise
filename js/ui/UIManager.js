@@ -204,6 +204,22 @@ class UIManager {
         const headerRight = document.createElement('div');
         headerRight.className = 'category-header-right';
         
+        // Bouton de réduction/expansion de tous les groupes favoris
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'favorites-toggle-button';
+        toggleButton.innerHTML = this._getGroupsCollapseState() ? 
+            '<i class="fas fa-expand-alt"></i> Déployer groupes' : 
+            '<i class="fas fa-compress-alt"></i> Réduire groupes';
+        toggleButton.setAttribute('title', this._getGroupsCollapseState() ? 'Déployer tous les groupes' : 'Réduire tous les groupes');
+        
+        toggleButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const collapseAll = !this._getGroupsCollapseState();
+            this.toggleAllFavoriteGroups(collapseAll);
+        });
+        
+        headerRight.appendChild(toggleButton);
+        
         // Bouton d'ajout de groupe
         const addGroupBtn = document.createElement('button');
         addGroupBtn.className = 'favorites-add-group-btn';
@@ -235,6 +251,91 @@ class UIManager {
         this._populateFavoritesGroups(groupsContainer, favoriteAppsGrouped, groups);
         
         return section;
+    }
+
+    /**
+     * Vérifie l'état global de collapse des groupes favoris
+     * @returns {boolean} true si la majorité des groupes sont repliés
+     * @private
+     */
+    _getGroupsCollapseState() {
+        const groupKeys = Object.keys(this._collapsedSections).filter(key => 
+            key.startsWith('group_') && key.endsWith('_collapsed')
+        );
+        
+        if (groupKeys.length === 0) return false;
+        
+        // Compte combien de groupes sont repliés
+        const collapsedCount = groupKeys.filter(key => this._collapsedSections[key]).length;
+        
+        // Si plus de la moitié sont repliés, considérer l'état global comme replié
+        return collapsedCount >= groupKeys.length / 2;
+    }
+
+    /**
+     * Bascule l'état de tous les groupes favoris
+     * @param {boolean} collapse - true pour replier, false pour déplier
+     */
+    toggleAllFavoriteGroups(collapse) {
+        
+        // Récupère tous les éléments de groupe
+        const groupElements = document.querySelectorAll('.favorites-group');
+        
+        groupElements.forEach(groupElement => {
+            const groupId = groupElement.getAttribute('data-group-id');
+            if (!groupId) return;
+            
+            const groupKey = `group_${groupId}_collapsed`;
+            
+            // Met à jour l'état interne
+            this._collapsedSections[groupKey] = collapse;
+            
+            // Met à jour l'apparence
+            if (collapse) {
+                groupElement.classList.add('collapsed');
+            } else {
+                groupElement.classList.remove('collapsed');
+            }
+            
+            // Met à jour le bouton du groupe
+            const toggleButton = groupElement.querySelector('.section-toggle');
+            if (toggleButton) {
+                if (collapse) {
+                    toggleButton.classList.add('collapsed');
+                    toggleButton.setAttribute('aria-label', 'Déployer le groupe');
+                    toggleButton.setAttribute('title', 'Déployer le groupe');
+                } else {
+                    toggleButton.classList.remove('collapsed');
+                    toggleButton.setAttribute('aria-label', 'Réduire le groupe');
+                    toggleButton.setAttribute('title', 'Réduire le groupe');
+                }
+            }
+        });
+        
+        // Sauvegarde l'état
+        this._saveCollapsedSections();
+        
+        // Met à jour le bouton global des favoris
+        this._updateFavoritesToggleButton();
+    }
+
+    /**
+     * Met à jour l'état du bouton global des favoris
+     * @private
+     */
+    _updateFavoritesToggleButton() {
+        const toggleButton = document.querySelector('.favorites-toggle-button');
+        if (!toggleButton) return;
+        
+        const areGroupsCollapsed = this._getGroupsCollapseState();
+        
+        if (areGroupsCollapsed) {
+            toggleButton.innerHTML = '<i class="fas fa-expand-alt"></i> Déployer groupes';
+            toggleButton.setAttribute('title', 'Déployer tous les groupes');
+        } else {
+            toggleButton.innerHTML = '<i class="fas fa-compress-alt"></i> Réduire groupes';
+            toggleButton.setAttribute('title', 'Réduire tous les groupes');
+        }
     }
     
     /**
@@ -287,7 +388,7 @@ class UIManager {
     
     /**
      * Crée un élément de groupe de favoris
-     * Version améliorée pour gérer les groupes vides
+     * Version améliorée pour gérer les groupes vides et les réductions/expansions
      * @param {Object} group - Données du groupe
      * @param {Array} apps - Applications du groupe
      * @param {boolean} [isEmpty=false] - Indique si le groupe est vide
@@ -302,6 +403,13 @@ class UIManager {
         }
         groupElement.setAttribute('data-group-id', group.id);
         
+        // Vérifie si le groupe doit être réduit
+        const groupCollapseKey = `group_${group.id}_collapsed`;
+        const isGroupCollapsed = this._collapsedSections[groupCollapseKey];
+        if (isGroupCollapsed) {
+            groupElement.classList.add('collapsed');
+        }
+        
         // En-tête du groupe
         const groupHeader = document.createElement('div');
         groupHeader.className = 'favorites-group-header';
@@ -311,10 +419,29 @@ class UIManager {
         groupTitle.className = 'favorites-group-title';
         groupTitle.innerHTML = `<i class="fas fa-${group.icon}" style="color: ${group.color}"></i> ${group.name}`;
         
-        // Boutons d'action du groupe (sauf pour le groupe général)
+        // Boutons d'action du groupe
         const groupActions = document.createElement('div');
         groupActions.className = 'favorites-group-actions';
         
+        // Bouton de réduction/expansion pour tous les groupes
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'section-toggle';
+        toggleButton.setAttribute('aria-label', isGroupCollapsed ? 'Déployer le groupe' : 'Réduire le groupe');
+        toggleButton.setAttribute('title', isGroupCollapsed ? 'Déployer le groupe' : 'Réduire le groupe');
+        toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i>';
+        
+        if (isGroupCollapsed) {
+            toggleButton.classList.add('collapsed');
+        }
+        
+        toggleButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Éviter la propagation au groupe
+            this.toggleGroupCollapse(groupCollapseKey, groupElement);
+        });
+        
+        groupActions.appendChild(toggleButton);
+        
+        // Ajouter les autres boutons d'action (sauf pour le groupe général)
         if (group.id !== 'general') {
             // Bouton d'édition du groupe
             const editBtn = document.createElement('button');
@@ -375,6 +502,41 @@ class UIManager {
         this._setupDragAndDrop(appGrid, group.id);
         
         return groupElement;
+    }
+
+    /**
+     * Bascule l'état réduit d'un groupe de favoris
+     * @param {string} groupKey - Clé du groupe dans _collapsedSections
+     * @param {HTMLElement} groupElement - Élément DOM du groupe
+     */
+    toggleGroupCollapse(groupKey, groupElement) {
+        // Inverse l'état actuel
+        const isCollapsed = !this._collapsedSections[groupKey];
+        this._collapsedSections[groupKey] = isCollapsed;
+        
+        // Met à jour l'apparence
+        if (isCollapsed) {
+            groupElement.classList.add('collapsed');
+        } else {
+            groupElement.classList.remove('collapsed');
+        }
+        
+        // Met à jour le bouton
+        const toggleButton = groupElement.querySelector('.section-toggle');
+        if (toggleButton) {
+            if (isCollapsed) {
+                toggleButton.classList.add('collapsed');
+                toggleButton.setAttribute('aria-label', 'Déployer le groupe');
+                toggleButton.setAttribute('title', 'Déployer le groupe');
+            } else {
+                toggleButton.classList.remove('collapsed');
+                toggleButton.setAttribute('aria-label', 'Réduire le groupe');
+                toggleButton.setAttribute('title', 'Réduire le groupe');
+            }
+        }
+        
+        // Sauvegarde l'état
+        this._saveCollapsedSections();
     }
     
     /**
@@ -498,6 +660,27 @@ class UIManager {
             this._applyDropAnimation(container);
         });
     }
+
+    /**
+     * Met à jour la visibilité du bouton global de réduction/expansion
+     * @param {Array} visibleCategories - Liste des catégories visibles
+     */
+    updateGlobalToggleVisibility(visibleCategories) {
+        const globalToggleContainer = document.querySelector('.global-toggle-container');
+        if (!globalToggleContainer) return;
+        
+        // Vérifie s'il y a des sections non-favoris visibles
+        const hasVisibleNonFavoriteCategories = visibleCategories.some(category => 
+            category.id !== 'favorites'
+        );
+        
+        // Affiche ou masque le bouton global en fonction
+        if (hasVisibleNonFavoriteCategories) {
+            globalToggleContainer.style.display = '';
+        } else {
+            globalToggleContainer.style.display = 'none';
+        }
+    }
     
     /**
      * Met à jour l'affichage de toutes les catégories
@@ -523,14 +706,16 @@ class UIManager {
         // Vide le conteneur
         this.categoriesContainerElement.innerHTML = '';
         
-        // Ajoute le bouton global de réduction/expansion
-        const globalToggle = this._createGlobalToggleButton();
-        this.categoriesContainerElement.appendChild(globalToggle);
-        
         // Si la section de favoris existait, la remettre en premier
         if (favoritesSection) {
             this.categoriesContainerElement.appendChild(favoritesSection);
         }
+        
+        // Crée le bouton global de réduction/expansion
+        const globalToggle = this._createGlobalToggleButton();
+        
+        // Ajoute le bouton global APRÈS la section des favoris
+        this.categoriesContainerElement.appendChild(globalToggle);
         
         // Ajoute une section pour chaque catégorie
         for (const category of categories) {
@@ -1068,10 +1253,6 @@ class UIManager {
      * @param {HTMLElement} sectionElement - Élément DOM de la section
      */
     toggleSectionCollapse(categoryId, sectionElement) {
-        // Si c'est la section des favoris, on ne la réduit pas
-        if (categoryId === 'favorites') {
-            return;
-        }
         
         // Inverse l'état actuel
         const isCollapsed = !this._collapsedSections[categoryId];
@@ -1110,6 +1291,9 @@ class UIManager {
         // Récupère toutes les sections de catégorie (sauf favoris)
         const sections = document.querySelectorAll('.category-section:not(#favorites-section)');
         
+        // Si pas de sections visibles, on ne fait rien
+        if (sections.length === 0) return;
+        
         sections.forEach(section => {
             const categoryId = section.id.replace('category-', '');
             
@@ -1141,8 +1325,20 @@ class UIManager {
         // Sauvegarde l'état
         this._saveCollapsedSections();
         
-        // Met à jour le bouton global
-        this._updateGlobalToggleButton();
+        // Met à jour le bouton global en utilisant directement l'état collapse
+        // plutôt que de vérifier le DOM qui peut prendre du temps à se mettre à jour
+        const globalToggleButton = document.getElementById('globalToggleButton');
+        if (globalToggleButton) {
+            if (collapse) {
+                // Si on vient de tout réduire, le prochain clic devra tout déployer
+                globalToggleButton.innerHTML = '<i class="fas fa-expand-alt"></i> Tout déployer';
+                globalToggleButton.setAttribute('data-action', 'expand');
+            } else {
+                // Si on vient de tout déployer, le prochain clic devra tout réduire
+                globalToggleButton.innerHTML = '<i class="fas fa-compress-alt"></i> Tout réduire';
+                globalToggleButton.setAttribute('data-action', 'collapse');
+            }
+        }
     }
     
     /**
@@ -1155,8 +1351,13 @@ class UIManager {
         
         // Détermine s'il y a au moins une section non réduite
         const sections = document.querySelectorAll('.category-section:not(#favorites-section)');
+        
+        // Si pas de sections visibles, on ne fait rien
+        if (sections.length === 0) return;
+        
         const hasExpandedSections = Array.from(sections).some(section => !section.classList.contains('collapsed'));
         
+        // Mise à jour du bouton en fonction de l'état actuel
         if (hasExpandedSections) {
             // S'il y a au moins une section déployée, le bouton sert à tout réduire
             globalToggleButton.innerHTML = '<i class="fas fa-compress-alt"></i> Tout réduire';

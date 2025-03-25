@@ -36,18 +36,13 @@
 }
 
 /* Style pour les sections réduites */
-.category-section.collapsed .app-grid,
+.category-section.collapsed:not(.favorites-section) .app-grid,
 .category-section.collapsed .category-description {
     display: none;
 }
 
 .category-section.collapsed {
     padding-bottom: var(--spacing-sm);
-}
-
-/* Style pour les sections favoris (toujours visible) */
-.favorites-section.collapsed .app-grid {
-    display: grid;
 }
 
 /* Bouton global de réduction/expansion */
@@ -101,6 +96,125 @@
     align-items: center;
     gap: var(--spacing-sm);
 }
+
+/* Style pour les groupes de favoris réduits */
+.favorites-group.collapsed .app-grid,
+.favorites-group.collapsed .favorites-empty-message {
+    display: none;
+}
+
+/* Adaptation du style pour les boutons de toggle dans les groupes */
+.favorites-group-header .section-toggle {
+    margin-left: 0;
+    margin-right: var(--spacing-xs);
+}
+
+/* Adaptation de l'espacement pour les groupes réduits */
+.favorites-group.collapsed {
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Animation de rotation pour l'icône dans les groupes */
+.favorites-group-header .section-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.favorites-group-header .section-toggle.collapsed i {
+    transform: rotate(-90deg);
+}
+
+/* Styles à ajouter dans section-collapse.css */
+
+/* Lorsque la section favoris est repliée, n'afficher que les en-têtes des groupes */
+.favorites-section.collapsed .favorites-groups-container {
+    display: block; /* On s'assure que le conteneur reste visible */
+}
+
+/* Masquer uniquement les grilles d'applications */
+.favorites-section.collapsed .app-grid,
+.favorites-section.collapsed .favorites-empty-message {
+    display: none;
+}
+
+/* Réduire l'espacement entre les groupes lorsque la section est repliée */
+.favorites-section.collapsed .favorites-group {
+    margin-bottom: var(--spacing-xs);
+    padding-bottom: 0;
+}
+
+/* Masquer la description de la section des favoris lorsqu'elle est repliée */
+.favorites-section.collapsed .category-description {
+    display: none;
+}
+
+/* Styles supplémentaires pour les groupes dans une section favoris repliée */
+
+/* Style compact pour les en-têtes des groupes dans une section repliée */
+.favorites-section.collapsed .favorites-group-header {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+/* Style pour les boutons de groupe dans une section repliée */
+.favorites-section.collapsed .favorites-group {
+    background-color: transparent; /* Fond transparent */
+}
+
+/* Ajustement du padding vertical pour l'en-tête des favoris */
+.favorites-section.collapsed .category-header {
+    padding-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Assurer que les groupes individuels peuvent toujours être dépliés */
+.favorites-section.collapsed .favorites-group.collapsed {
+    padding-bottom: 0;
+}
+
+.favorites-section.collapsed .favorites-group:not(.collapsed) .app-grid {
+    display: grid; /* Affiche la grille si le groupe est déplié */
+}
+
+/* Style pour le bouton global des favoris */
+.favorites-toggle-button {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--color-informative);
+    cursor: pointer;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    margin-right: var(--spacing-sm);
+}
+
+.favorites-toggle-button:hover {
+    color: var(--color-active);
+    border-color: var(--color-active);
+    background-color: var(--item-hover);
+}
+
+.dark-mode .favorites-toggle-button:hover {
+    color: var(--color-button-alt);
+    border-color: var(--color-button-alt);
+}
+
+/* Style pour les groupes et sous-sections */
+.favorites-section .app-grid,
+.favorites-group.collapsed .app-grid {
+    display: none;
+}
+
+/* Assurer que les groupes dans une section non-repliée affichent leur contenu */
+.favorites-section:not(.collapsed) .favorites-group:not(.collapsed) .app-grid {
+    display: grid;
+}
+
 
 /* Adaptation responsive */
 @media (max-width: 768px) {

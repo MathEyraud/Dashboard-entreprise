@@ -44,18 +44,18 @@
     transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* État par défaut: visible dans la section favoris, invisible ailleurs */
-.category-section:not(.favorites-section) .app-favorite-toggle {
+/* État par défaut: invisible dans toutes les sections */
+.app-favorite-toggle {
     opacity: 0;
 }
 
-/* Rendre visible au survol dans les sections normales */
-.category-section:not(.favorites-section) .app-tile:hover .app-favorite-toggle {
+/* Rendre visible au survol dans toutes les sections */
+.app-tile:hover .app-favorite-toggle {
     opacity: 1;
 }
 
-/* Toujours visible dans la section favoris */
-.favorites-section .app-favorite-toggle {
+/* Toujours afficher les étoiles des favoris dans les sections classiques */
+.category-section:not(.favorites-section) .app-favorite-toggle.is-favorite {
     opacity: 0.9;
 }
 

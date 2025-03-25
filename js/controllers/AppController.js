@@ -175,6 +175,9 @@ class AppController {
         // Passe le paramètre preserveScroll à updateCategories
         this.uiManager.updateCategories(visibleCategories, currentCategoryId, isInitialLoad, preserveScroll);
         
+        // Met à jour la visibilité du bouton global de réduction/expansion
+        this.uiManager.updateGlobalToggleVisibility(visibleCategories);
+        
         // Gestion des favoris avec groupes et réorganisation
         this.uiManager.updateFavorites(
             favoritesData, 
