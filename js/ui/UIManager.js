@@ -137,6 +137,9 @@ class UIManager {
                 );
             }
         }
+
+        // Configurer le déploiement au survol pour les sections repliées
+        this._setupHoverExpandForDrag();
     }
 
     /**
@@ -1077,6 +1080,135 @@ class UIManager {
     }
 
     /**
+    * Méthode à ajouter à la classe UIManager dans js/ui/UIManager.js
+    * Cette méthode configure les écouteurs pour déplier les sections au survol pendant le glissement
+    */
+    _setupHoverExpandForDrag() {
+        // Fonction pour gérer le survol d'une section repliée
+        const handleDragHover = (event, element, sectionId, isGroup = false) => {
+
+            // Ne rien faire si on n'est pas en train de glisser
+            if (!document.body.classList.contains('dragging-active')) return;
+            
+            // Si la section est déjà dépliée, ne rien faire
+            if (!element.classList.contains('collapsed')) return;
+            
+            // Récupération de l'élément en train d'être glissé
+            const draggingElement = document.querySelector('.dragging');
+            if (!draggingElement) return;
+            
+            console.log(`Survol détecté sur section repliée: ${sectionId}`);
+            
+            // Déplier temporairement la section
+            element.classList.remove('collapsed');
+            
+            // Stocker l'état initial pour pouvoir le restaurer si nécessaire
+            element.setAttribute('data-was-collapsed', 'true');
+            
+            // Pour les groupes, gérer le bouton de réduction/expansion
+            if (isGroup) {
+                const toggleButton = element.querySelector('.section-toggle');
+                if (toggleButton) {
+                    toggleButton.classList.remove('collapsed');
+                    toggleButton.setAttribute('aria-label', isGroup ? 'Réduire le groupe' : 'Réduire la section');
+                    toggleButton.setAttribute('title', isGroup ? 'Réduire le groupe' : 'Réduire la section');
+                }
+            }
+            
+            console.log(`Section dépliée temporairement: ${sectionId}`);
+        };
+        
+        // Fonction pour gérer la sortie d'une section après survol
+        const handleDragLeave = (event, element, sectionId, isGroup = false) => {
+            // Ne rien faire si on n'est pas en train de glisser
+            if (!document.body.classList.contains('dragging-active')) return;
+            
+            // Vérifier si l'élément était initialement replié
+            if (element.getAttribute('data-was-collapsed') === 'true') {
+                // Vérifier si on quitte réellement l'élément ou juste un enfant
+                const related = event.relatedTarget;
+                if (related && element.contains(related)) {
+                    return; // On reste dans l'élément, ne rien faire
+                }
+                
+                console.log(`Sortie détectée de la section: ${sectionId}`);
+                
+                // Replier la section
+                element.classList.add('collapsed');
+                element.removeAttribute('data-was-collapsed');
+                
+                // Pour les groupes, gérer le bouton de réduction/expansion
+                if (isGroup) {
+                    const toggleButton = element.querySelector('.section-toggle');
+                    if (toggleButton) {
+                        toggleButton.classList.add('collapsed');
+                        toggleButton.setAttribute('aria-label', isGroup ? 'Déployer le groupe' : 'Déployer la section');
+                        toggleButton.setAttribute('title', isGroup ? 'Déployer le groupe' : 'Déployer la section');
+                    }
+                }
+                
+                console.log(`Section repliée: ${sectionId}`);
+            }
+        };
+
+        // Configurer les écouteurs pour la section des favoris
+        const favoritesSection = document.getElementById('favorites-section');
+        if (favoritesSection) {
+            favoritesSection.addEventListener('dragenter', (e) => {
+                handleDragHover(e, favoritesSection, 'favorites');
+            });
+            
+            favoritesSection.addEventListener('dragleave', (e) => {
+                handleDragLeave(e, favoritesSection, 'favorites');
+            });
+        }
+
+        // Configurer les écouteurs pour les groupes de favoris
+        document.querySelectorAll('.favorites-group').forEach(group => {
+            const groupId = group.getAttribute('data-group-id');
+            if (!groupId) return;
+            
+            group.addEventListener('dragenter', (e) => {
+                handleDragHover(e, group, groupId, true);
+            });
+            
+            group.addEventListener('dragleave', (e) => {
+                handleDragLeave(e, group, groupId, true);
+            });
+        });
+
+        // Dans la méthode _handleGlobalDragEnd, ajouter ce code:
+        // Réinitialiser tous les éléments dépliés temporairement pendant le drag
+        document.querySelectorAll('[data-was-collapsed="true"]').forEach(element => {
+            element.classList.add('collapsed');
+            element.removeAttribute('data-was-collapsed');
+            
+            const toggleButton = element.querySelector('.section-toggle');
+            if (toggleButton) {
+                toggleButton.classList.add('collapsed');
+                toggleButton.setAttribute('aria-label', 'Déployer la section');
+                toggleButton.setAttribute('title', 'Déployer la section');
+            }
+        });
+
+        // Configurer les écouteurs pour les sections classiques
+        document.querySelectorAll('.category-section:not(.favorites-section)').forEach(section => {
+            const sectionId = section.id;
+            if (!sectionId) return;
+            
+            const categoryId = sectionId.replace('category-', '');
+            
+            section.addEventListener('dragenter', (e) => {
+                handleDragHover(e, section, categoryId);
+            });
+            
+            section.addEventListener('dragleave', (e) => {
+                handleDragLeave(e, section, categoryId);
+            });
+        });
+    }
+
+    /**
      * Gère la fin d'une opération de drag and drop au niveau global
      * Cette méthode séparée permet d'être appelée de différents endroits
      * @private
@@ -1308,16 +1440,22 @@ class UIManager {
             }
             
             // Met à jour le bouton
-            const toggleButton = section.querySelector('.section-toggle');
-            if (toggleButton) {
+            const globalToggleButton = document.getElementById('globalToggleButton');
+            if (globalToggleButton) {
                 if (collapse) {
-                    toggleButton.classList.add('collapsed');
-                    toggleButton.setAttribute('aria-label', 'Déployer la section');
-                    toggleButton.setAttribute('title', 'Déployer la section');
+                    // Si on vient de tout réduire, le prochain clic devra tout déployer
+                    globalToggleButton.innerHTML = '<i class="fas fa-expand-alt"></i> Tout déployer';
+                    globalToggleButton.setAttribute('data-action', 'expand');
+                    globalToggleButton.setAttribute('aria-label', 'Tout déployer');
+                    // Ajout du title descriptif
+                    globalToggleButton.setAttribute('title', 'Tout déployer - Afficher le contenu de toutes les sections');
                 } else {
-                    toggleButton.classList.remove('collapsed');
-                    toggleButton.setAttribute('aria-label', 'Réduire la section');
-                    toggleButton.setAttribute('title', 'Réduire la section');
+                    // Si on vient de tout déployer, le prochain clic devra tout réduire
+                    globalToggleButton.innerHTML = '<i class="fas fa-compress-alt"></i> Tout réduire';
+                    globalToggleButton.setAttribute('data-action', 'collapse');
+                    globalToggleButton.setAttribute('aria-label', 'Tout réduire');
+                    // Ajout du title descriptif
+                    globalToggleButton.setAttribute('title', 'Tout réduire - Masquer le contenu de toutes les sections');
                 }
             }
         });
@@ -1362,10 +1500,16 @@ class UIManager {
             // S'il y a au moins une section déployée, le bouton sert à tout réduire
             globalToggleButton.innerHTML = '<i class="fas fa-compress-alt"></i> Tout réduire';
             globalToggleButton.setAttribute('data-action', 'collapse');
+            globalToggleButton.setAttribute('aria-label', 'Tout réduire');
+            // Ajout du title descriptif
+            globalToggleButton.setAttribute('title', 'Tout réduire - Masquer le contenu de toutes les sections');
         } else {
             // Si toutes les sections sont réduites, le bouton sert à tout déployer
             globalToggleButton.innerHTML = '<i class="fas fa-expand-alt"></i> Tout déployer';
             globalToggleButton.setAttribute('data-action', 'expand');
+            globalToggleButton.setAttribute('aria-label', 'Tout déployer');
+            // Ajout du title descriptif
+            globalToggleButton.setAttribute('title', 'Tout déployer - Afficher le contenu de toutes les sections');
         }
     }
     
@@ -1383,6 +1527,7 @@ class UIManager {
         button.id = 'globalToggleButton';
         button.setAttribute('data-action', 'collapse');
         button.setAttribute('aria-label', 'Tout réduire');
+        button.setAttribute('title', 'Tout réduire - Masquer le contenu de toutes les sections');
         button.innerHTML = '<i class="fas fa-compress-alt"></i> Tout réduire';
         
         button.addEventListener('click', () => {

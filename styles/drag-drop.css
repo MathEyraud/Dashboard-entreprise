@@ -1,14 +1,19 @@
 /* styles/drag-drop.css - Styles pour améliorer l'expérience de drag-and-drop */
 
-/* ===== CONTENEURS DE DÉPÔT POTENTIELS ===== */
+/*------------------------------------------------------
+ * CONTENEURS DE DÉPÔT ET ÉTATS GLOBAUX
+ *------------------------------------------------------*/
 
-/* Conteneur potentiel pendant le drag */
+/* Style de base pour les conteneurs de dépôt potentiels */
 .potential-drop-target {
-    transition: border 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
+    transition: transform 0.3s ease, 
+                border 0.3s ease, 
+                box-shadow 0.3s ease,
+                background-color 0.3s ease;
 }
 
-/* Effet de surbrillance pour les conteneurs potentiels de dépôt */
+/* Indicateur visuel de base pour les cibles de dépôt */
 .potential-drop-target::before {
     content: '';
     position: absolute;
@@ -20,59 +25,16 @@
     border-radius: var(--border-radius-md);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, border 0.3s ease;
     z-index: 5;
 }
 
+/* Version dark mode de l'indicateur */
 .dark-mode .potential-drop-target::before {
     border-color: rgba(var(--color-button-alt-rgb), 0.4);
 }
 
-/* Conteneur survolé avec l'élément glissé - bordure plus visible */
-.drag-over::before {
-    opacity: 1;
-    border-width: 3px;
-    border-style: dashed;
-    border-color: var(--color-active);
-    animation: border-pulse 1.5s infinite;
-}
-
-.dark-mode .drag-over::before {
-    border-color: var(--color-button-alt);
-}
-
-/* Animation pulsatoire pour les bordures */
-@keyframes border-pulse {
-    0% {
-        border-color: rgba(var(--color-active-rgb), 0.6);
-    }
-    50% {
-        border-color: rgba(var(--color-active-rgb), 1);
-    }
-    100% {
-        border-color: rgba(var(--color-active-rgb), 0.6);
-    }
-}
-
-.dark-mode .drag-over::before {
-    animation: border-pulse-dark 1.5s infinite;
-}
-
-@keyframes border-pulse-dark {
-    0% {
-        border-color: rgba(var(--color-button-alt-rgb), 0.6);
-    }
-    50% {
-        border-color: rgba(var(--color-button-alt-rgb), 1);
-    }
-    100% {
-        border-color: rgba(var(--color-button-alt-rgb), 0.6);
-    }
-}
-
-/* ===== NOUVELLE FONCTIONNALITÉ: MISE EN ÉVIDENCE GLOBALE ===== */
-
-/* État global lorsqu'un drag est en cours */
+/* État actif pendant le drag (pour tous les conteneurs potentiels) */
 body.dragging-active .potential-drop-target::before {
     opacity: 0.7;
     border: 2px dashed rgba(var(--color-active-rgb), 0.5);
@@ -82,7 +44,7 @@ body.dragging-active .potential-drop-target::before {
     border-color: rgba(var(--color-button-alt-rgb), 0.5);
 }
 
-/* Amélioration de la visibilité avec un léger fond */
+/* Effet de soulèvement subtil pour les conteneurs potentiels */
 body.dragging-active .potential-drop-target {
     background-color: rgba(var(--color-active-rgb), 0.02);
     transform: translateY(-2px);
@@ -94,109 +56,21 @@ body.dragging-active .potential-drop-target {
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Style pour mettre en évidence les groupes de favoris entiers */
-.favorites-group.potential-drop-container {
-    position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.favorites-group.potential-drop-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease, border 0.3s ease;
-    opacity: 0;
-    border-radius: var(--border-radius-md);
-    z-index: 1;
-}
-
-body.dragging-active .favorites-group.potential-drop-container::before {
-    opacity: 0.5;
-    border: 2px dashed rgba(var(--color-active-rgb), 0.5);
-}
-
-.dark-mode.dragging-active .favorites-group.potential-drop-container::before {
-    border-color: rgba(var(--color-button-alt-rgb), 0.5);
-}
-
-/* Assurer que les zones vides sont bien visibles */
-body.dragging-active .favorites-group-empty .favorites-empty-message {
-    border-color: rgba(var(--color-active-rgb), 0.5);
-    background-color: rgba(var(--color-active-rgb), 0.05);
-    animation: subtle-pulse 2s infinite;
-}
-
-.dark-mode.dragging-active .favorites-group-empty .favorites-empty-message {
-    border-color: rgba(var(--color-button-alt-rgb), 0.5);
-    background-color: rgba(var(--color-button-alt-rgb), 0.08);
-    animation: subtle-pulse-dark 2s infinite;
-}
-
-/* Animation subtile de pulsation pour les zones vides */
-@keyframes subtle-pulse {
-    0% { background-color: rgba(var(--color-active-rgb), 0.03); }
-    50% { background-color: rgba(var(--color-active-rgb), 0.08); }
-    100% { background-color: rgba(var(--color-active-rgb), 0.03); }
-}
-
-@keyframes subtle-pulse-dark {
-    0% { background-color: rgba(var(--color-button-alt-rgb), 0.05); }
-    50% { background-color: rgba(var(--color-button-alt-rgb), 0.12); }
-    100% { background-color: rgba(var(--color-button-alt-rgb), 0.05); }
-}
-
-/* ===== EFFETS SUR LES GROUPES ===== */
-
-/* Effet amélioré pour le groupe survolé */
-.favorites-group.group-drag-over {
-    transform: translateY(-4px) scale(1.01) !important;
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15) !important;
-    z-index: 20;
+/* État de survol - mise en évidence du conteneur */
+.drag-over::before {
+    opacity: 1;
+    border-width: 3px;
+    border-style: dashed;
     border-color: var(--color-active);
+    animation: border-pulse 1.5s infinite;
 }
 
-.dark-mode .favorites-group.group-drag-over {
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3) !important;
+.dark-mode .drag-over::before {
     border-color: var(--color-button-alt);
+    animation: border-pulse-dark 1.5s infinite;
 }
 
-/* ===== EFFETS SUR LES TUILES ===== */
-
-/* Animation fluide pour les tuiles d'applications */
-.app-tile {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-    will-change: transform, opacity;
-}
-
-/* Effet pour la tuile en cours de glissement */
-.app-tile.dragging {
-    opacity: 0.7;
-    transform: scale(1.05) rotate(1deg);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    z-index: 100;
-    cursor: grabbing;
-}
-
-/* Survol des autres tuiles pendant le glissement */
-.app-grid.drag-active .app-tile:not(.dragging) {
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
-}
-
-/* Désemphatiser les tuiles non concernées par le drag */
-body.dragging-active .app-tile:not(.dragging) {
-    opacity: 0.8;
-    filter: saturate(0.9);
-    transition: opacity 0.3s ease, filter 0.3s ease;
-}
-
-/* ===== INDICATEURS DE DÉPÔT ===== */
-
-/* Style d'indicateur de dépôt */
+/* Indicateurs de dépôt dans les conteneurs */
 .drop-indicator {
     position: absolute;
     bottom: 10px;
@@ -217,47 +91,63 @@ body.dragging-active .app-tile:not(.dragging) {
     background-color: var(--color-button-alt);
 }
 
-/* Afficher les indicateurs pendant le drag */
+/* Visibilité des indicateurs pendant le drag */
 body.dragging-active .potential-drop-target .drop-indicator {
     opacity: 0.9;
 }
 
-/* Augmenter l'opacité au survol */
 .drag-over .drop-indicator {
     opacity: 1 !important;
 }
 
-/* ===== EFFETS POUR LES GRILLES ===== */
+/*------------------------------------------------------
+ * STYLES POUR LES SECTIONS FAVORITES ET GROUPES
+ *------------------------------------------------------*/
 
-/* Effet de soulèvement pour les grilles pendant le survol */
-.app-grid.drag-over {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+/* Style pour les groupes de favoris */
+.favorites-group.potential-drop-container {
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.dark-mode .app-grid.drag-over {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+.favorites-group.potential-drop-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, border 0.3s ease;
+    opacity: 0;
+    border-radius: var(--border-radius-md);
+    z-index: 1;
 }
 
-/* Grille active pendant le drag avec un minimum de hauteur */
-.app-grid.drag-active {
-    min-height: 100px;
-    transition: all 0.2s ease;
+/* Mise en évidence des groupes pendant le drag */
+body.dragging-active .favorites-group.potential-drop-container::before {
+    opacity: 0.5;
+    border: 2px dashed rgba(var(--color-active-rgb), 0.5);
 }
 
-/* Amélioration du message vide pour le drag */
-.favorites-section .app-grid.drag-over {
-    background-color: rgba(var(--color-active-rgb), 0.05);
-    min-height: 100px;
+.dark-mode.dragging-active .favorites-group.potential-drop-container::before {
+    border-color: rgba(var(--color-button-alt-rgb), 0.5);
 }
 
-.dark-mode .favorites-section .app-grid.drag-over {
-    background-color: rgba(var(--color-button-alt-rgb), 0.1);
+/* Effet spécial pour le groupe actuellement survolé */
+.favorites-group.group-drag-over {
+    transform: translateY(-4px) scale(1.01) !important;
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15) !important;
+    z-index: 20;
+    border-color: var(--color-active);
 }
 
-/* ===== AMÉLIORATIONS POUR LES SECTIONS VIDES ===== */
+.dark-mode .favorites-group.group-drag-over {
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3) !important;
+    border-color: var(--color-button-alt);
+}
 
-/* Amélioration spécifique pour les sections vides */
+/* Styles pour les sections vides */
 .favorites-group-empty .app-grid.potential-drop-target {
     min-height: 120px;
     display: flex;
@@ -265,7 +155,19 @@ body.dragging-active .potential-drop-target .drop-indicator {
     justify-content: center;
 }
 
-/* Message d'indication explicite pour les zones vides */
+body.dragging-active .favorites-group-empty .favorites-empty-message {
+    border-color: rgba(var(--color-active-rgb), 0.5);
+    background-color: rgba(var(--color-active-rgb), 0.05);
+    animation: subtle-pulse 2s infinite;
+}
+
+.dark-mode.dragging-active .favorites-group-empty .favorites-empty-message {
+    border-color: rgba(var(--color-button-alt-rgb), 0.5);
+    background-color: rgba(var(--color-button-alt-rgb), 0.08);
+    animation: subtle-pulse-dark 2s infinite;
+}
+
+/* Zone vide pendant le survol */
 .favorites-group-empty .app-grid.drag-over .favorites-empty-message {
     background-color: rgba(var(--color-active-rgb), 0.08);
     transform: scale(1.05);
@@ -279,9 +181,200 @@ body.dragging-active .potential-drop-target .drop-indicator {
     border-color: var(--color-button-alt);
 }
 
-/* ===== AUTRES EFFETS VISUELS ===== */
+/*------------------------------------------------------
+ * ÉTATS ET STYLES DES GRILLES D'APPLICATIONS
+ *------------------------------------------------------*/
 
-/* Effet de rebond léger quand un élément est déposé */
+/* Effet de soulèvement pour les grilles d'applications */
+.app-grid.drag-over {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .app-grid.drag-over {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Hauteur minimale pour les grilles pendant le drag */
+.app-grid.drag-active {
+    min-height: 100px;
+    transition: all 0.2s ease;
+}
+
+/* Mise en évidence de la grille favoris */
+.favorites-section .app-grid.drag-over {
+    background-color: rgba(var(--color-active-rgb), 0.05);
+    min-height: 100px;
+}
+
+.dark-mode .favorites-section .app-grid.drag-over {
+    background-color: rgba(var(--color-button-alt-rgb), 0.1);
+}
+
+/*------------------------------------------------------
+ * STYLES POUR LES ÉLÉMENTS EN COURS DE GLISSEMENT
+ *------------------------------------------------------*/
+
+/* Base pour les tuiles d'applications */
+.app-tile {
+    transition: transform 0.2s ease, 
+                box-shadow 0.2s ease, 
+                opacity 0.2s ease;
+    will-change: transform, opacity;
+}
+
+/* Style pour la tuile actuellement glissée */
+.app-tile.dragging {
+    opacity: 0.7;
+    transform: scale(1.05) rotate(1deg);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    cursor: grabbing;
+}
+
+/* Style pour les autres tuiles pendant le glissement */
+.app-grid.drag-active .app-tile:not(.dragging) {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+body.dragging-active .app-tile:not(.dragging) {
+    opacity: 0.8;
+    filter: saturate(0.9);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Curseur pendant le glissement */
+.dragging, .dragging * {
+    cursor: grabbing !important;
+}
+
+body.dragging-active {
+    cursor: grabbing;
+}
+
+/*------------------------------------------------------
+ * NOUVELLES FONCTIONNALITÉS: SECTIONS REPLIÉES
+ *------------------------------------------------------*/
+
+/* Base pour les sections repliées */
+body.dragging-active .favorites-section.collapsed,
+body.dragging-active .favorites-group.collapsed {
+    position: relative;
+    overflow: visible;  /* Permettre à l'indicateur de déborder */
+}
+
+/* Indicateur visuel pour les sections repliées */
+body.dragging-active .favorites-section.collapsed::after,
+body.dragging-active .favorites-group.collapsed::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(var(--color-active-rgb), 0.05);
+    border: 2px dashed rgba(var(--color-active-rgb), 0.3);
+    border-radius: var(--border-radius-md);
+    pointer-events: none;
+    z-index: 10;
+    animation: pulse-border 2s infinite;
+}
+
+.dark-mode.dragging-active .favorites-section.collapsed::after,
+.dark-mode.dragging-active .favorites-group.collapsed::after {
+    background-color: rgba(var(--color-button-alt-rgb), 0.05);
+    border-color: rgba(var(--color-button-alt-rgb), 0.3);
+    animation: pulse-border-dark 2s infinite;
+}
+
+/* Message d'aide pour sections repliées */
+body.dragging-active .favorites-section.collapsed::before,
+body.dragging-active .favorites-group.collapsed::before {
+    content: 'Survoler pour déplier';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-active);
+    color: white;
+    padding: 3px 8px;
+    font-size: var(--font-size-xs);
+    border-radius: var(--border-radius-sm);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 20;
+}
+
+.dark-mode.dragging-active .favorites-section.collapsed::before,
+.dark-mode.dragging-active .favorites-group.collapsed::before {
+    background-color: var(--color-button-alt);
+}
+
+/* Afficher l'aide au survol */
+body.dragging-active .favorites-section.collapsed:hover::before,
+body.dragging-active .favorites-group.collapsed:hover::before {
+    opacity: 1;
+}
+
+/* Effet de survol pour les sections repliées */
+body.dragging-active .favorites-section.collapsed:hover::after,
+body.dragging-active .favorites-group.collapsed:hover::after {
+    background-color: rgba(var(--color-active-rgb), 0.1);
+    border-width: 3px;
+}
+
+body.dragging-active.dark-mode .favorites-section.collapsed:hover::after,
+body.dragging-active.dark-mode .favorites-group.collapsed:hover::after {
+    background-color: rgba(var(--color-button-alt-rgb), 0.1);
+}
+
+/*------------------------------------------------------
+ * ANIMATIONS ET EFFETS
+ *------------------------------------------------------*/
+
+/* Animation de pulsation pour les bordures */
+@keyframes border-pulse {
+    0% { border-color: rgba(var(--color-active-rgb), 0.6); }
+    50% { border-color: rgba(var(--color-active-rgb), 1); }
+    100% { border-color: rgba(var(--color-active-rgb), 0.6); }
+}
+
+@keyframes border-pulse-dark {
+    0% { border-color: rgba(var(--color-button-alt-rgb), 0.6); }
+    50% { border-color: rgba(var(--color-button-alt-rgb), 1); }
+    100% { border-color: rgba(var(--color-button-alt-rgb), 0.6); }
+}
+
+/* Animation de pulsation pour les sections repliées */
+@keyframes pulse-border {
+    0% { border-color: rgba(var(--color-active-rgb), 0.3); }
+    50% { border-color: rgba(var(--color-active-rgb), 0.7); }
+    100% { border-color: rgba(var(--color-active-rgb), 0.3); }
+}
+
+@keyframes pulse-border-dark {
+    0% { border-color: rgba(var(--color-button-alt-rgb), 0.3); }
+    50% { border-color: rgba(var(--color-button-alt-rgb), 0.7); }
+    100% { border-color: rgba(var(--color-button-alt-rgb), 0.3); }
+}
+
+/* Animation de pulsation pour les zones vides */
+@keyframes subtle-pulse {
+    0% { background-color: rgba(var(--color-active-rgb), 0.03); }
+    50% { background-color: rgba(var(--color-active-rgb), 0.08); }
+    100% { background-color: rgba(var(--color-active-rgb), 0.03); }
+}
+
+@keyframes subtle-pulse-dark {
+    0% { background-color: rgba(var(--color-button-alt-rgb), 0.05); }
+    50% { background-color: rgba(var(--color-button-alt-rgb), 0.12); }
+    100% { background-color: rgba(var(--color-button-alt-rgb), 0.05); }
+}
+
+/* Animation pour l'effet de rebond au dépôt */
 @keyframes drop-bounce {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -292,19 +385,33 @@ body.dragging-active .potential-drop-target .drop-indicator {
     animation: drop-bounce 0.3s ease;
 }
 
-/* Style pour le curseur pendant le glisser-déposer */
-.dragging, .dragging * {
-    cursor: grabbing !important;
+/*------------------------------------------------------
+ * UTILITAIRES & RÉINITIALISATION
+ *------------------------------------------------------*/
+
+/* Classes pour réinitialiser les effets de drag */
+.reset-drag-effects .potential-drop-target::before {
+    opacity: 0 !important;
+    border: none !important;
 }
 
-body.dragging-active {
-    cursor: grabbing;
+.reset-drag-effects .drag-over,
+.reset-drag-effects .drag-active,
+.reset-drag-effects .dragging,
+.reset-drag-effects .drag-target-highlight,
+.reset-drag-effects .group-drag-over {
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: initial !important;
+    opacity: 1 !important;
 }
 
-/* ===== ADAPTATIONS RESPONSIVES ===== */
+/*------------------------------------------------------
+ * ADAPTATIONS RESPONSIVES
+ *------------------------------------------------------*/
 
 @media (max-width: 768px) {
-    /* Réduire légèrement les effets pour les tablettes */
+    /* Réduire les effets pour les tablettes */
     .app-tile.dragging {
         transform: scale(1.03) rotate(1deg);
     }
@@ -320,7 +427,7 @@ body.dragging-active {
 }
 
 @media (max-width: 480px) {
-    /* Simplifier encore plus pour les mobiles */
+    /* Simplifier pour les mobiles */
     .app-tile.dragging {
         transform: scale(1.02) rotate(0.5deg);
     }
@@ -339,45 +446,4 @@ body.dragging-active {
         0% { background-color: rgba(var(--color-active-rgb), 0.04); }
         100% { background-color: rgba(var(--color-active-rgb), 0.04); }
     }
-}
-
-/* Styles pour mettre en évidence toutes les zones cibles pendant le drag-and-drop */
-
-/* Classe appliquée au body lorsqu'un drag est en cours */
-body.dragging-active .potential-drop-target::before {
-    opacity: 0.7;
-    border: 2px dashed var(--color-active);
-    border-radius: var(--border-radius-md);
-}
-
-.dark-mode.dragging-active .potential-drop-target::before {
-    border-color: var(--color-button-alt);
-}
-
-/* Style spécifique pour groupes vides pendant le drag */
-body.dragging-active .favorites-group-empty .favorites-empty-message {
-    border-color: var(--color-active);
-    background-color: rgba(var(--color-active-rgb), 0.05);
-}
-
-.dark-mode.dragging-active .favorites-group-empty .favorites-empty-message {
-    border-color: var(--color-button-alt);
-    background-color: rgba(var(--color-button-alt-rgb), 0.07);
-}
-
-/* Styles de réinitialisation pour garantir que les effets de drag ne persistent pas */
-.reset-drag-effects .potential-drop-target::before {
-    opacity: 0 !important;
-    border: none !important;
-}
-
-.reset-drag-effects .drag-over,
-.reset-drag-effects .drag-active,
-.reset-drag-effects .dragging,
-.reset-drag-effects .drag-target-highlight,
-.reset-drag-effects .group-drag-over {
-    transform: none !important;
-    box-shadow: none !important;
-    border-color: initial !important;
-    opacity: 1 !important;
 }
