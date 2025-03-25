@@ -1,0 +1,213 @@
+/* styles/favorite-group-selector.css - Styles for the favorite group selection popup */
+
+.favorite-group-selector {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+.favorite-group-selector.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.group-selector-content {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 350px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.favorite-group-selector.active .group-selector-content {
+    transform: translateY(0);
+}
+
+.group-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.group-selector-title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+}
+
+.group-selector-close {
+    background: none;
+    border: none;
+    color: var(--color-informative);
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.group-selector-close:hover {
+    background-color: var(--item-hover);
+    color: var(--text-light);
+}
+
+.groups-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.group-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.group-item:hover {
+    background-color: var(--item-hover);
+}
+
+.group-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.group-info {
+    flex: 1;
+}
+
+.group-name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+}
+
+.group-count {
+    font-size: var(--font-size-xs);
+    color: var(--color-informative);
+}
+
+.app-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background-color: var(--item-hover);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.app-preview-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.app-preview-info {
+    flex: 1;
+}
+
+.app-preview-name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-light);
+}
+
+.app-preview-category {
+    font-size: var(--font-size-xs);
+    color: var(--color-informative);
+}
+
+.create-group-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: rgba(var(--color-active-rgb), 0.1);
+    margin-top: var(--spacing-sm);
+    color: var(--color-active);
+}
+
+.dark-mode .create-group-option {
+    background-color: rgba(var(--color-button-alt-rgb), 0.1);
+    color: var(--color-button-alt);
+}
+
+.create-group-option:hover {
+    background-color: rgba(var(--color-active-rgb), 0.2);
+}
+
+.dark-mode .create-group-option:hover {
+    background-color: rgba(var(--color-button-alt-rgb), 0.2);
+}
+
+/* Animation pour l'apparition du popup */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.group-selector-content {
+    animation: fadeInUp 0.3s ease;
+}
+
+/* Adaptations mobiles */
+@media (max-width: 480px) {
+    .group-selector-content {
+        width: 95%;
+        max-width: 300px;
+        padding: var(--spacing-sm);
+    }
+    
+    .group-icon, .app-preview-icon {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .group-name, .app-preview-name {
+        font-size: var(--font-size-sm);
+    }
+}

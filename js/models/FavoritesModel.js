@@ -570,7 +570,7 @@ class FavoritesModel {
             }
         }
         
-        // NOUVEAU: Trier les applications par nom dans chaque groupe
+        // Trier les applications par nom dans chaque groupe
         Object.keys(favoriteAppsGrouped).forEach(groupId => {
             favoriteAppsGrouped[groupId].apps.sort((a, b) => {
                 // Tri alphabétique insensible à la casse

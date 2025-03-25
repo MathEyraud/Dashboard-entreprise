@@ -32,7 +32,7 @@ class AppController {
         this.themeManager = new ThemeManager();
         this.dockManager = new DockManager(this.dockStateModel);
 
-        // Gestionnaire de recherche avec les nouveaux services
+        // Gestionnaire de recherche
         this.searchManager = new SearchManager(
             this.categoryModel,
             this.searchModelService,
@@ -98,61 +98,129 @@ class AppController {
     
     /**
      * Bascule une application dans les favoris ou l'ajoute à un groupe spécifique
+     * Mise à jour pour supporter le sélecteur de groupe de favoris
      * @param {string} appId - ID de l'application
      * @param {string} categoryId - ID de la catégorie
      * @param {string} [targetGroupId='general'] - ID du groupe cible (optionnel)
      * @param {HTMLElement} [sourceElement=null] - Élément source (bouton étoile) ayant déclenché l'action
      */
-    toggleFavorite(appId, categoryId, targetGroupId = 'general', sourceElement = null) {
+    toggleFavorite = function(appId, categoryId, targetGroupId = 'general', sourceElement = null) {
+        // Log pour le débogage
+        console.log(`toggleFavorite appelé avec: appId=${appId}, categoryId=${categoryId}, targetGroupId=${targetGroupId}`);
+        
         // Sauvegarde la position de défilement actuelle
         const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
         
-        // Détermine si l'application était déjà en favoris dans le groupe spécifique
-        const wasInGroup = this.favoritesModel.isInFavoriteGroup(appId, targetGroupId);
-        
-        // NOUVEAU: Mise à jour visuelle immédiate du bouton sans recharger l'interface
-        if (sourceElement && sourceElement.classList.contains('app-favorite-toggle')) {
-            // Mettre à jour l'apparence du bouton immédiatement
-            if (wasInGroup) {
-                // Si on retire des favoris du groupe
-                sourceElement.innerHTML = '<i class="far fa-star"></i>';
-                sourceElement.setAttribute('title', 'Ajouter aux favoris');
-                sourceElement.setAttribute('aria-label', 'Ajouter aux favoris');
-                sourceElement.classList.remove('is-favorite');
-            } else {
-                // Si on ajoute aux favoris du groupe
-                sourceElement.innerHTML = '<i class="fas fa-star"></i>';
-                sourceElement.setAttribute('title', 'Retirer des favoris');
-                sourceElement.setAttribute('aria-label', 'Retirer des favoris');
-                sourceElement.classList.add('is-favorite');
+        // Cas spécial pour la sélection de groupe lors de l'ajout initial
+        if (!this.favoritesModel.isFavorite(appId) && targetGroupId === 'general') {
+            // Récupère tous les groupes
+            const groups = this.favoritesModel.getGroups() || [];
+            
+            // S'il y a plus d'un groupe, affiche le sélecteur de groupe
+            if (groups.length > 1) {
+                // Récupère les données de l'application
+                const category = this.categoryModel.getCategoryData(categoryId);
+                if (!category || !category.apps) {
+                    console.error(`Catégorie non trouvée: ${categoryId}`);
+                    return;
+                }
+                
+                const app = category.apps.find(a => a.id === appId);
+                if (!app) {
+                    console.error(`Application non trouvée: ${appId} dans la catégorie ${categoryId}`);
+                    return;
+                }
+                
+                // Affiche le sélecteur de groupe
+                this.uiManager.showGroupSelector(
+                    app, 
+                    categoryId, 
+                    (appId, categoryId, groupId) => {
+                        console.log(`Callback de sélection appelé avec: appId=${appId}, categoryId=${categoryId}, groupId=${groupId}`);
+                        this.toggleFavorite(appId, categoryId, groupId);
+                    },
+                    (action, id, extraId) => this.handleGroupAction(action, id, extraId)
+                );
+                
+                return; // Arrête l'exécution ici car le sélecteur va gérer l'ajout
             }
         }
         
-        if (wasInGroup) {
-            // Si l'application est déjà dans ce groupe, la retirer
-            this.favoritesModel.removeFromGroup(appId, targetGroupId);
-        } else {
-            // Sinon, l'ajouter au groupe cible
-            this.favoritesModel.addFavorite(appId, categoryId, targetGroupId);
+        // Traitement spécial pour le groupe "general"
+        if (targetGroupId === 'general') {
+            console.log("Traitement spécial pour le groupe Général dans toggleFavorite");
+            
+            // Vérification explicite pour le groupe general
+            const isInGeneralGroup = this.favoritesModel.isInFavoriteGroup(appId, 'general');
+            console.log(`L'app ${appId} est-elle dans le groupe Général? ${isInGeneralGroup}`);
+            
+            // Mise à jour visuelle du bouton si fourni
+            if (sourceElement && sourceElement.classList.contains('app-favorite-toggle')) {
+                if (isInGeneralGroup) {
+                    // Si on retire des favoris du groupe
+                    sourceElement.innerHTML = '<i class="far fa-star"></i>';
+                    sourceElement.setAttribute('title', 'Ajouter aux favoris');
+                    sourceElement.setAttribute('aria-label', 'Ajouter aux favoris');
+                    sourceElement.classList.remove('is-favorite');
+                } else {
+                    // Si on ajoute aux favoris du groupe
+                    sourceElement.innerHTML = '<i class="fas fa-star"></i>';
+                    sourceElement.setAttribute('title', 'Retirer des favoris');
+                    sourceElement.setAttribute('aria-label', 'Retirer des favoris');
+                    sourceElement.classList.add('is-favorite');
+                }
+            }
+            
+            // Opération directe sur le modèle de favoris
+            if (isInGeneralGroup) {
+                console.log(`Suppression de l'app ${appId} du groupe Général`);
+                this.favoritesModel.removeFromGroup(appId, 'general');
+            } else {
+                console.log(`Ajout de l'app ${appId} au groupe Général`);
+                this.favoritesModel.addFavorite(appId, categoryId, 'general');
+            }
+        } 
+        // Traitement standard pour les autres groupes
+        else {
+            const wasInGroup = this.favoritesModel.isInFavoriteGroup(appId, targetGroupId);
+            
+            // Mise à jour visuelle du bouton
+            if (sourceElement && sourceElement.classList.contains('app-favorite-toggle')) {
+                if (wasInGroup) {
+                    sourceElement.innerHTML = '<i class="far fa-star"></i>';
+                    sourceElement.setAttribute('title', 'Ajouter aux favoris');
+                    sourceElement.setAttribute('aria-label', 'Ajouter aux favoris');
+                    sourceElement.classList.remove('is-favorite');
+                } else {
+                    sourceElement.innerHTML = '<i class="fas fa-star"></i>';
+                    sourceElement.setAttribute('title', 'Retirer des favoris');
+                    sourceElement.setAttribute('aria-label', 'Retirer des favoris');
+                    sourceElement.classList.add('is-favorite');
+                }
+            }
+            
+            if (wasInGroup) {
+                this.favoritesModel.removeFromGroup(appId, targetGroupId);
+            } else {
+                this.favoritesModel.addFavorite(appId, categoryId, targetGroupId);
+            }
         }
         
-        // Reconstruire l'index de recherche car les favoris ont changé
+        // Reconstruire l'index de recherche
         this.searchModelService.rebuildIndex();
         
-        // NOUVEAU: Retarder légèrement la mise à jour complète de l'interface
-        // pour permettre à l'animation visuelle de se terminer
+        // Mise à jour différée de l'interface
         setTimeout(() => {
-            // Mise à jour complète de l'interface avec préservation du défilement
             this.updateDisplay(true, true);
             
-            // Restaure la position de défilement après la mise à jour du DOM
+            // Restaure la position de défilement
             window.scrollTo({
                 top: scrollPosition,
                 behavior: 'auto'
             });
-        }, 100); // Délai de 100ms pour permettre à l'animation de se terminer
-    }
-
+        }, 100);
+    };
+    
     /**
      * Met à jour l'affichage global de l'application
      * @param {boolean} isInitialLoad - Indique s'il s'agit du chargement initial
