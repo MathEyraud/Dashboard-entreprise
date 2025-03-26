@@ -344,6 +344,13 @@
     margin-left: 0;
 }
 
+/* Cibler spécifiquement les grilles de favoris lorsqu'elles sont visibles en mode liste */
+.layout-list .favorites-group:not(.collapsed) .app-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
 /* Adaptations responsive pour les différentes vues */
 @media (max-width: 768px) {
     .display-options-wrapper {

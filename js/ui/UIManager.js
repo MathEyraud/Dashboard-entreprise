@@ -859,7 +859,6 @@ class UIManager {
         }
         
         // Rendre TOUTES les tuiles d'applications glissables
-        // Pas seulement celles dans la section favoris
         tileLink.setAttribute('draggable', 'true');
         
         // Si nous sommes dans les favoris, ajouter l'attribut de groupe
@@ -868,7 +867,6 @@ class UIManager {
             tileLink.setAttribute('data-group-id', currentGroupId);
         }
         
-        // Dans la méthode _createAppTile de la classe UIManager, remplacez le gestionnaire dragstart existant
         tileLink.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('application/app-id', app.id);
             e.dataTransfer.setData('application/category-id', categoryId || '');
@@ -883,9 +881,6 @@ class UIManager {
             
             // Ajouter la classe dragging à la tuile en cours de déplacement
             tileLink.classList.add('dragging');
-            
-            // Les autres classes sont maintenant gérées par _setupGlobalDragEvents
-            // via la classe body.dragging-active
         });
         
         tileLink.addEventListener('dragend', () => {
@@ -994,17 +989,35 @@ class UIManager {
         });
         
         tileLink.appendChild(iconElement);
-        // Pour la vue grille standard, on ajoute directement le nom
+        
         // Pour la vue liste, on ajoute le conteneur de contenu
         if (document.body.classList.contains('layout-list')) {
+            // Ajoutez le conteneur de contenu avec la description si disponible
+            const contentElement = document.createElement('div');
+            contentElement.className = 'app-content';
+            
+            // Ajoutez le nom de l'application au conteneur de contenu
+            contentElement.appendChild(nameElement);
+            
+            // Ajoutez la description si disponible
+            if (app.description) {
+                const descriptionElement = document.createElement('div');
+                descriptionElement.className = 'app-description';
+                descriptionElement.textContent = app.description;
+                contentElement.appendChild(descriptionElement);
+            }
+            
+            // Ajoutez le conteneur de contenu à la tuile
             tileLink.appendChild(contentElement);
         } else {
+            // Pour la vue grille standard, ajoutez directement le nom
             tileLink.appendChild(nameElement);
         }
+        
         tileLink.appendChild(favoriteButton);
         
         return tileLink;
-    }    
+    }   
     
     /**
      * Fait défiler jusqu'à la catégorie active avec un décalage pour la visibilité du titre
