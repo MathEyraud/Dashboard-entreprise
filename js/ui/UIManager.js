@@ -55,6 +55,11 @@ class UIManager {
         // L'écouteur sera configuré lors de la création du menu de navigation
         this.categoryChangeCallback = categoryChangeCallback;
         this.favoritesCheckCallback = favoritesCheckCallback;
+
+        // Ajout de l'écouteur pour les mises à jour de favoris
+        document.addEventListener('favoritesUpdated', () => {
+            this.updateAllFavoriteButtons();
+        });
     }
     
     /**
@@ -1052,16 +1057,38 @@ class UIManager {
      */
     _setupGlobalDragEvents() {
         // Écouteur global pour détecter le début d'une opération de glisser-déposer
-        document.addEventListener('dragstart', () => {
+        document.addEventListener('dragstart', (e) => {
             console.log('Drag started - global handler');
+            
             // Ajouter une classe au body pour indiquer qu'un drag est en cours
             document.body.classList.add('dragging-active');
+            
+            // Si le drag vient des résultats de recherche, garder la recherche visible
+            if (e.target.closest('.search-result-item')) {
+                const searchResults = document.querySelector('.search-results');
+                if (searchResults && searchResults.classList.contains('active')) {
+                    searchResults.classList.add('drag-in-progress');
+                }
+            }
             
             // Identifier toutes les zones cibles potentielles immédiatement
             document.querySelectorAll('.app-grid[data-group-id]').forEach(grid => {
                 if (!grid.classList.contains('potential-drop-target')) {
                     grid.classList.add('potential-drop-target');
                 }
+                
+                // Vérifier si l'indicateur de dépôt existe déjà
+                if (!grid.querySelector('.drop-indicator')) {
+                    const dropIndicator = document.createElement('div');
+                    dropIndicator.className = 'drop-indicator';
+                    dropIndicator.textContent = 'Déposer ici';
+                    grid.appendChild(dropIndicator);
+                }
+            });
+            
+            // S'assurer que tous les groupes peuvent être des cibles même s'ils sont vides
+            document.querySelectorAll('.favorites-group').forEach(group => {
+                group.classList.add('potential-drop-container');
             });
             
             // Identifier clairement les groupes vides
@@ -1071,32 +1098,153 @@ class UIManager {
         });
         
         // Écouteur global pour la fin d'un drag
-        document.addEventListener('dragend', this._handleGlobalDragEnd.bind(this));
-        
-        // Écouteur de sécurité sur document pour s'assurer que le drag est réinitialisé
-        document.addEventListener('mouseup', () => {
-            if (document.body.classList.contains('dragging-active')) {
-                console.log('Mouse up detected while dragging - cleanup triggered');
-                this._handleGlobalDragEnd();
+        document.addEventListener('dragend', () => {
+            console.log('Drag ended - cleaning up');
+            
+            // Nettoyer la classe spéciale sur les résultats de recherche
+            const searchResults = document.querySelector('.search-results');
+            if (searchResults) {
+                searchResults.classList.remove('drag-in-progress');
             }
+            
+            // Retirer la classe du body
+            document.body.classList.remove('dragging-active');
+            
+            // Nettoyer toutes les classes liées au drag-and-drop
+            document.querySelectorAll('.drag-over, .drag-active, .dragging, .drag-target-highlight, .group-drag-over').forEach(element => {
+                element.classList.remove('drag-over', 'drag-active', 'dragging', 'drag-target-highlight', 'group-drag-over');
+            });
+            
+            // Réinitialiser complètement les bordures et les styles
+            document.querySelectorAll('.potential-drop-target').forEach(target => {
+                // Garder la classe pour de futures opérations mais réinitialiser les styles visuels
+                target.style.borderColor = '';
+                target.style.boxShadow = '';
+                target.style.transform = '';
+            });
+            
+            // Réinitialiser également les groupes
+            document.querySelectorAll('.favorites-group').forEach(group => {
+                group.classList.remove('group-drag-over');
+            });
+            
+            // Réinitialiser tous les éléments dépliés temporairement pendant le drag
+            document.querySelectorAll('[data-was-collapsed="true"]').forEach(element => {
+                element.classList.add('collapsed');
+                element.removeAttribute('data-was-collapsed');
+                
+                const toggleButton = element.querySelector('.section-toggle');
+                if (toggleButton) {
+                    toggleButton.classList.add('collapsed');
+                    toggleButton.setAttribute('aria-label', 'Déployer la section');
+                    toggleButton.setAttribute('title', 'Déployer la section');
+                }
+            });
         });
         
-        // Écouteur supplémentaire sur document
-        document.addEventListener('click', () => {
-            // Vérifier si une opération de drag semble être en cours alors qu'elle ne devrait pas
-            if (document.body.classList.contains('dragging-active') && 
-                !document.querySelector('.dragging')) {
-                console.log('Click detected while interface shows dragging - cleanup triggered');
-                this._handleGlobalDragEnd();
+        // Écouteur pour le dépôt au niveau du document
+        document.addEventListener('drop', (e) => {
+            // Si un drop a lieu, s'assurer que les résultats de recherche sont nettoyés
+            const searchResults = document.querySelector('.search-results');
+            if (searchResults) {
+                searchResults.classList.remove('drag-in-progress');
+                
+                // Si le drop a réussi sur une cible valide (hors de la recherche)
+                if (!e.target.closest('.search-results')) {
+                    // Fermer les résultats
+                    searchResults.classList.remove('active');
+                }
             }
         });
     }
 
     /**
+     * Met à jour l'état des boutons de favoris pour toutes les tuiles d'applications
+     * Cette méthode doit être appelée après toute modification des favoris
+     */
+    updateAllFavoriteButtons() {
+        // Mettre à jour les boutons dans les sections normales
+        document.querySelectorAll('.app-tile:not([data-group-id])').forEach(tile => {
+            const appId = tile.getAttribute('data-app-id');
+            if (!appId) return;
+            
+            const favoriteButton = tile.querySelector('.app-favorite-toggle');
+            if (!favoriteButton) return;
+            
+            // Vérifier si l'application est en favoris
+            const isFavorite = window.appController && 
+                            window.appController.favoritesModel && 
+                            window.appController.favoritesModel.isFavorite(appId);
+            
+            // Mettre à jour l'apparence du bouton
+            if (isFavorite) {
+                favoriteButton.innerHTML = '<i class="fas fa-star"></i>';
+                favoriteButton.setAttribute('title', 'Retirer des favoris');
+                favoriteButton.setAttribute('aria-label', 'Retirer des favoris');
+                favoriteButton.classList.add('is-favorite');
+            } else {
+                favoriteButton.innerHTML = '<i class="far fa-star"></i>';
+                favoriteButton.setAttribute('title', 'Ajouter aux favoris');
+                favoriteButton.setAttribute('aria-label', 'Ajouter aux favoris');
+                favoriteButton.classList.remove('is-favorite');
+            }
+        });
+        
+        // Si nous avons un SearchManager actif, mettre également à jour les résultats de recherche
+        if (window.appController && window.appController.searchManager) {
+            window.appController.searchManager._updateFavoriteButtons();
+        }
+    }
+
+    /**
+     * Met à jour l'état des boutons de favoris pour une application spécifique
+     * @param {string} appId - ID de l'application à mettre à jour
+     */
+    updateFavoriteButtonsForApp(appId) {
+        if (!appId) return;
+        
+        // Récupérer l'état actuel de l'application
+        const isFavorite = window.appController && 
+                        window.appController.favoritesModel && 
+                        window.appController.favoritesModel.isFavorite(appId);
+        
+        // Mettre à jour tous les boutons pour cette application
+        document.querySelectorAll(`.app-tile[data-app-id="${appId}"] .app-favorite-toggle`).forEach(button => {
+            if (isFavorite) {
+                button.innerHTML = '<i class="fas fa-star"></i>';
+                button.setAttribute('title', 'Retirer des favoris');
+                button.setAttribute('aria-label', 'Retirer des favoris');
+                button.classList.add('is-favorite');
+            } else {
+                button.innerHTML = '<i class="far fa-star"></i>';
+                button.setAttribute('title', 'Ajouter aux favoris');
+                button.setAttribute('aria-label', 'Ajouter aux favoris');
+                button.classList.remove('is-favorite');
+            }
+        });
+        
+        // Mettre à jour les résultats de recherche correspondants
+        document.querySelectorAll(`.search-result-item[data-app-id="${appId}"] .search-result-favorite`).forEach(button => {
+            if (isFavorite) {
+                button.innerHTML = '<i class="fas fa-star"></i>';
+                button.setAttribute('title', 'Retirer des favoris');
+                button.setAttribute('aria-label', 'Retirer des favoris');
+                button.classList.add('is-favorite');
+            } else {
+                button.innerHTML = '<i class="far fa-star"></i>';
+                button.setAttribute('title', 'Ajouter aux favoris');
+                button.setAttribute('aria-label', 'Ajouter aux favoris');
+                button.classList.remove('is-favorite');
+            }
+        });
+    }
+    
+    /**
     * Méthode à ajouter à la classe UIManager dans js/ui/UIManager.js
     * Cette méthode configure les écouteurs pour déplier les sections au survol pendant le glissement
     */
     _setupHoverExpandForDrag() {
+
         // Fonction pour gérer le survol d'une section repliée
         const handleDragHover = (event, element, sectionId, isGroup = false) => {
 
@@ -1218,6 +1366,13 @@ class UIManager {
             section.addEventListener('dragleave', (e) => {
                 handleDragLeave(e, section, categoryId);
             });
+        });
+
+        // S'assurer que tous les groupes de favoris sont des cibles potentielles
+        document.querySelectorAll('.app-grid[data-group-id]').forEach(grid => {
+            if (!grid.classList.contains('potential-drop-target')) {
+                grid.classList.add('potential-drop-target');
+            }
         });
     }
 

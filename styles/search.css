@@ -321,6 +321,199 @@
     color: var(--color-informative);
 }
 
+/* ===== STYLES POUR LES RÉSULTATS DE RECHERCHE ===== */
+
+/* Style pour le bouton favoris dans les résultats de recherche */
+.search-result-favorite {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+}
+
+.search-result-item:hover .search-result-favorite {
+    opacity: 1;
+}
+
+.search-result-favorite.is-favorite {
+    opacity: 0.9;
+}
+
+.search-result-favorite i {
+    font-size: 14px;
+    color: #888;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.search-result-favorite:hover {
+    transform: translateY(-50%) scale(1.1);
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-result-favorite:hover i.far {
+    color: #333;
+}
+
+.search-result-favorite i.fas {
+    color: #FFD700; /* Étoile pleine en or */
+    animation: star-pulse 0.4s ease-out;
+}
+
+.search-result-favorite:hover i.fas {
+    color: #FFA500; /* Orange plus foncé au survol */
+}
+
+/* Mode sombre: augmenter la visibilité de l'étoile */
+.dark-mode .search-result-favorite i.fas {
+    color: #FFC107; /* Jaune plus vif */
+    filter: drop-shadow(0px 0px 2px rgba(255, 255, 255, 0.5)); /* Léger halo */
+}
+
+.dark-mode .search-result-favorite {
+    background-color: rgba(0, 0, 0, 0.4); /* Fond plus sombre */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Bordure subtile */
+}
+
+.dark-mode .search-result-favorite:hover {
+    background-color: rgba(0, 0, 0, 0.6); /* Fond encore plus sombre au survol */
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dark-mode .search-result-favorite i.far {
+    color: #CCC; /* Gris clair pour l'étoile vide */
+}
+
+/* S'assurer que les éléments de recherche sont bien positionnés relativement */
+.search-result-item {
+    position: relative;
+    padding-right: 40px; /* Espace pour le bouton de favoris */
+}
+
+/* ===== STYLES POUR LE GLISSER-DÉPOSER ===== */
+
+/* Style pour l'élément en cours de glissement */
+.search-result-item.dragging {
+    opacity: 0.7;
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    cursor: grabbing;
+    background-color: var(--card-bg);
+    position: relative;
+}
+
+/* Animation pour l'ajout aux favoris */
+@keyframes star-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+@keyframes favorite-added {
+    0% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.5); }
+    100% { transform: translateY(-50%) scale(1); }
+}
+
+.search-result-favorite.just-added {
+    animation: favorite-added 0.5s ease-out;
+}
+
+/* Styles pour l'intégration du glisser-déposer avec la recherche */
+.search-results {
+    /* Assurer que les résultats restent visibles pendant le glisser-déposer */
+    z-index: 900; /* Les cibles de dépôt devraient avoir un z-index supérieur */
+}
+
+/* Maintenir les résultats de recherche visibles lors du glisser-déposer */
+.search-results.active.drag-in-progress {
+    /* Garder visible mais sans bloquer les interactions */
+    opacity: 0.9 !important;
+    visibility: visible !important;
+    /* Réduire légèrement la taille pour indiquer l'état de drag */
+    transform: scale(0.98);
+    transition: transform 0.2s ease;
+}
+
+/* Style spécial pour la fenêtre de recherche pendant un drag */
+.search-results.drag-in-progress {
+    border: 2px dashed var(--color-active);
+    box-shadow: 0 0 15px rgba(var(--color-active-rgb), 0.2);
+}
+
+.dark-mode .search-results.drag-in-progress {
+    border-color: var(--color-button-alt);
+    box-shadow: 0 0 15px rgba(var(--color-button-alt-rgb), 0.2);
+}
+
+/* Donner un z-index plus élevé aux cibles pendant le drag */
+body.dragging-active .potential-drop-target,
+body.dragging-active .potential-drop-container {
+    z-index: 950;
+    position: relative;
+}
+
+/* Indiquer visuellement qu'un élément peut être glissé */
+.search-result-item {
+    cursor: pointer;
+}
+
+.search-result-item:active {
+    cursor: grabbing;
+}
+
+/* Style pour l'état actif dans les résultats de recherche */
+.search-result-item.active {
+    background-color: var(--item-hover);
+}
+
+/* ===== ADAPTATIONS RESPONSIVES ===== */
+
+/* Adaptation pour les petits écrans */
+@media (max-width: 768px) {
+    .search-result-favorite {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .search-result-favorite i {
+        font-size: 12px;
+    }
+    
+    .search-result-item {
+        padding-right: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-result-favorite {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .search-result-favorite i {
+        font-size: 10px;
+    }
+    
+    .search-result-item {
+        padding-right: 30px;
+    }
+}
+
 /* Adaptation responsive */
 @media (max-width: 768px) {
     .header-content {

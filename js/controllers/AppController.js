@@ -179,6 +179,7 @@ class AppController {
                 console.log(`Ajout de l'app ${appId} au groupe Général`);
                 this.favoritesModel.addFavorite(appId, categoryId, 'general');
             }
+
         } 
         // Traitement standard pour les autres groupes
         else {
@@ -205,6 +206,27 @@ class AppController {
                 this.favoritesModel.addFavorite(appId, categoryId, targetGroupId);
             }
         }
+
+        // Appliquer une animation sur l'élément source s'il s'agit d'un bouton
+        if (sourceElement) {
+            // Si c'est une étoile de tuile normale
+            if (sourceElement.classList.contains('app-favorite-toggle')) {
+                sourceElement.classList.add('just-clicked');
+                setTimeout(() => {
+                    sourceElement.classList.remove('just-clicked');
+                }, 500);
+            }
+            // Si c'est une étoile de résultat de recherche
+            else if (sourceElement.classList.contains('search-result-favorite')) {
+                sourceElement.classList.add('just-added');
+                setTimeout(() => {
+                    sourceElement.classList.remove('just-added');
+                }, 500);
+            }
+        }
+        
+        // Pour éviter les mises à jour visuelles trop fréquentes (throttling)
+        this.synchronizeFavorites();
         
         // Reconstruire l'index de recherche
         this.searchModelService.rebuildIndex();
@@ -220,6 +242,38 @@ class AppController {
             });
         }, 100);
     };
+
+    /**
+     * Synchronise l'état des favoris dans toute l'interface
+     * Cette méthode doit être appelée après toute modification importante des favoris
+     */
+    synchronizeFavorites() {
+        // 1. Mettre à jour les boutons de favoris dans toutes les sections
+        if (this.uiManager) {
+            this.uiManager.updateAllFavoriteButtons();
+        }
+        
+        // 2. Reconstruire l'index de recherche pour intégrer les changements
+        if (this.searchModelService) {
+            this.searchModelService.rebuildIndex();
+        }
+        
+        // 3. Mettre à jour les résultats de recherche si actifs
+        if (this.searchManager && this.searchManager._lastSearchTerm) {
+            this.searchManager.refreshSearchResults(this.searchManager._lastSearchTerm);
+        }
+        
+        // 4. Mettre à jour l'affichage des favoris dans la section correspondante
+        this.updateDisplay(false, true);
+        
+        // 5. Déclencher un événement pour informer d'autres composants potentiels
+        const event = new CustomEvent('favoritesFullyUpdated', {
+            detail: { timestamp: Date.now() }
+        });
+        document.dispatchEvent(event);
+        
+        console.log('État des favoris entièrement synchronisé');
+    }
     
     /**
      * Met à jour l'affichage global de l'application
@@ -271,6 +325,9 @@ class AppController {
     init() {
         // Met à jour l'affichage en spécifiant qu'il s'agit du chargement initial
         this.updateDisplay(true);
+
+        // Met à jour les étoiles de favoris
+        this.uiManager.updateAllFavoriteButtons();
         
         // Met à jour le timestamp de dernière visite
         StorageService.updatePreference('lastVisit', new Date().toISOString());
@@ -289,6 +346,8 @@ class AppController {
         
         // Met à jour l'interface
         this.updateDisplay(true);
+
+        this.synchronizeFavorites();
     }
 
     /**
@@ -301,5 +360,7 @@ class AppController {
     handleGroupAction(action, id = null, extraId = null, sourceGroupId = null) {
         // Délègue au gestionnaire de groupes en passant le paramètre sourceGroupId
         this.favoritesGroupManager.handleGroupAction(action, id, extraId, sourceGroupId);
+
+        this.synchronizeFavorites();
     }
 }

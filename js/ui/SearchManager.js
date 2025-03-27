@@ -228,6 +228,52 @@ class SearchManager {
                 this.searchInput.blur();
             }
         });
+
+        document.addEventListener('favoritesUpdated', () => {
+            // Mise à jour des boutons
+            this._updateFavoriteButtons();
+            
+            // Si on a des résultats actifs, les rafraîchir
+            if (this.searchResults && this.searchResults.classList.contains('active') && this._lastSearchTerm) {
+                this.refreshSearchResults(this._lastSearchTerm);
+            }
+        });
+    }
+
+    /**
+     * Met à jour l'état des boutons de favoris dans les résultats
+     * @private
+     */
+    _updateFavoriteButtons() {
+        if (!this.searchResults) return;
+        
+        const resultItems = this.searchResults.querySelectorAll('.search-result-item');
+        
+        resultItems.forEach(item => {
+            const appId = item.getAttribute('data-app-id');
+            if (!appId) return;
+            
+            const favoriteButton = item.querySelector('.search-result-favorite');
+            if (!favoriteButton) return;
+            
+            // Vérifier l'état actuel
+            const isFavorite = window.appController && 
+                            window.appController.favoritesModel &&
+                            window.appController.favoritesModel.isFavorite(appId);
+            
+            // Mettre à jour l'apparence
+            if (isFavorite) {
+                favoriteButton.innerHTML = '<i class="fas fa-star"></i>';
+                favoriteButton.setAttribute('title', 'Retirer des favoris');
+                favoriteButton.setAttribute('aria-label', 'Retirer des favoris');
+                favoriteButton.classList.add('is-favorite');
+            } else {
+                favoriteButton.innerHTML = '<i class="far fa-star"></i>';
+                favoriteButton.setAttribute('title', 'Ajouter aux favoris');
+                favoriteButton.setAttribute('aria-label', 'Ajouter aux favoris');
+                favoriteButton.classList.remove('is-favorite');
+            }
+        });
     }
     
     /**
@@ -330,6 +376,9 @@ class SearchManager {
      */
     performSearch(searchTerm) {
         if (!this.searchResults) return;
+
+        // Stocker le terme pour pouvoir rafraîchir plus tard
+        this._lastSearchTerm = searchTerm;
         
         // Ajouter le terme à l'historique
         if (this._searchHistoryModel) {
@@ -429,6 +478,73 @@ class SearchManager {
         resultItem.setAttribute('data-app-id', app.id);
         resultItem.setAttribute('data-category-id', app.categoryId);
         
+        // Rendre l'élément glissable
+        resultItem.setAttribute('draggable', 'true');
+        
+        // Ajout des écouteurs pour le glisser-déposer
+        resultItem.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('application/app-id', app.id);
+            e.dataTransfer.setData('application/category-id', app.categoryId);
+            e.dataTransfer.setData('application/is-favorite', 'false');
+            
+            // Ajouter la classe dragging pour les effets visuels
+            resultItem.classList.add('dragging');
+            
+            // Ajouter un délai avant de montrer qu'un drag est en cours
+            setTimeout(() => {
+                // Uniquement si l'élément est toujours en train d'être glissé
+                if (resultItem.classList.contains('dragging')) {
+                    // Ajouter des classes pour indiquer visuellement les cibles potentielles
+                    document.querySelectorAll('.favorites-group').forEach(group => {
+                        group.classList.add('drag-target-highlight');
+                    });
+                    
+                    // Et montrer un message d'aide
+                    const helpMsg = document.createElement('div');
+                    helpMsg.className = 'drag-help-message';
+                    helpMsg.textContent = 'Glissez vers un groupe de favoris';
+                    helpMsg.style.position = 'fixed';
+                    helpMsg.style.top = '10px';
+                    helpMsg.style.left = '50%';
+                    helpMsg.style.transform = 'translateX(-50%)';
+                    helpMsg.style.backgroundColor = 'rgba(0,0,0,0.7)';
+                    helpMsg.style.color = 'white';
+                    helpMsg.style.padding = '8px 16px';
+                    helpMsg.style.borderRadius = '4px';
+                    helpMsg.style.zIndex = '9999';
+                    helpMsg.style.fontSize = '14px';
+                    helpMsg.style.opacity = '0';
+                    helpMsg.style.transition = 'opacity 0.3s ease';
+                    
+                    document.body.appendChild(helpMsg);
+                    
+                    // Afficher progressivement le message
+                    setTimeout(() => {
+                        helpMsg.style.opacity = '1';
+                    }, 10);
+                    
+                    // Stocker une référence au message pour le supprimer plus tard
+                    resultItem.helpMessage = helpMsg;
+                }
+            }, 200);
+        });
+        
+        resultItem.addEventListener('dragend', () => {
+            // Retirer la classe dragging
+            resultItem.classList.remove('dragging');
+            
+            // Supprimer le message d'aide si présent
+            if (resultItem.helpMessage) {
+                resultItem.helpMessage.remove();
+                delete resultItem.helpMessage;
+            }
+            
+            // Nettoyer toutes les classes liées au drag-and-drop
+            document.querySelectorAll('.drag-over, .drag-active, .group-drag-over').forEach(element => {
+                element.classList.remove('drag-over', 'drag-active', 'group-drag-over');
+            });
+        });
+        
         // Icône de l'application
         const iconElement = document.createElement('div');
         iconElement.className = 'search-result-icon';
@@ -480,8 +596,86 @@ class SearchManager {
             contentElement.appendChild(tagsElement);
         }
         
+        // Bouton de favoris pour le résultat de recherche
+        const favoriteButton = document.createElement('button');
+        favoriteButton.className = 'search-result-favorite';
+        
+        // Vérifier si l'app est déjà en favoris
+        const isFavorite = window.appController && window.appController.favoritesModel &&
+                          window.appController.favoritesModel.isFavorite(app.id);
+        
+        // Définir l'apparence et les attributs en fonction de l'état
+        favoriteButton.innerHTML = isFavorite ? 
+            '<i class="fas fa-star"></i>' : 
+            '<i class="far fa-star"></i>';
+        favoriteButton.setAttribute('title', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
+        favoriteButton.setAttribute('aria-label', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
+        
+        if (isFavorite) {
+            favoriteButton.classList.add('is-favorite');
+        }
+        
+        // Ajouter l'écouteur d'événement pour le bouton de favoris
+        favoriteButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Si l'app n'est pas encore en favoris, on affiche le sélecteur de groupe
+            if (!isFavorite && window.appController && window.appController.uiManager) {
+                // Récupérer les données complètes de l'application depuis la catégorie
+                const category = window.appController.categoryModel.getCategoryData(app.categoryId);
+                if (category && category.apps) {
+                    const fullAppData = category.apps.find(a => a.id === app.id);
+                    if (fullAppData) {
+                        // Fermer les résultats de recherche
+                        this.searchResults.classList.remove('active');
+                        
+                        // Afficher le sélecteur de groupe
+                        window.appController.uiManager.showGroupSelector(
+                            fullAppData,
+                            app.categoryId,
+                            (appId, categoryId, groupId) => {
+                                window.appController.toggleFavorite(appId, categoryId, groupId);
+                            },
+                            (action, id, extraId) => window.appController.handleGroupAction(action, id, extraId)
+                        );
+                        
+                        // Animation de l'étoile
+                        if (!isFavorite) {
+                            // Ajouter une classe pour l'animation
+                            favoriteButton.classList.add('just-added');
+                            // Et la retirer après l'animation
+                            setTimeout(() => {
+                                favoriteButton.classList.remove('just-added');
+                            }, 500);
+                        }
+                        
+                        return;
+                    }
+                }
+            }
+            
+            // Si l'app est déjà en favoris ou si on n'a pas pu récupérer ses données complètes,
+            // on utilise le comportement par défaut
+            if (window.appController) {
+                window.appController.toggleFavorite(app.id, app.categoryId, 'general', favoriteButton);
+                
+                // Animation de l'étoile
+                if (!isFavorite) {
+                    // Ajouter une classe pour l'animation
+                    favoriteButton.classList.add('just-added');
+                    // Et la retirer après l'animation
+                    setTimeout(() => {
+                        favoriteButton.classList.remove('just-added');
+                    }, 500);
+                }
+            }
+        });
+        
+        // Ajouter les éléments au résultat
         resultItem.appendChild(iconElement);
         resultItem.appendChild(contentElement);
+        resultItem.appendChild(favoriteButton);
         
         // Ajouter un écouteur de clic pour ouvrir l'application
         resultItem.addEventListener('click', () => {
@@ -495,6 +689,23 @@ class SearchManager {
         return resultItem;
     }
     
+    /**
+     * Rafraîchit les résultats de recherche actuels
+     * @param {string} searchTerm - Le terme de recherche actuel
+     */
+    refreshSearchResults(searchTerm) {
+        if (!searchTerm || searchTerm.trim().length === 0) return;
+        
+        // Refaire la recherche avec le terme actuel
+        const results = this._searchModelService.search(searchTerm, {
+            categoryId: this._currentCategoryFilter || undefined,
+            fuzzy: true
+        });
+        
+        // Afficher les résultats mis à jour
+        this._displayResults(results, searchTerm);
+    }
+
     /**
      * Enregistre l'utilisation d'une application
      * @param {string} appId - ID de l'application

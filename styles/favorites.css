@@ -119,6 +119,45 @@
     100% { transform: scale(1); }
 }
 
+/* Animation pour le clic sur un bouton de favoris */
+@keyframes star-clicked {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.app-favorite-toggle.just-clicked {
+    animation: star-clicked 0.5s ease-out;
+}
+
+/* Améliorons également l'animation de pulsation des étoiles */
+@keyframes star-pulse {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    50% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Assurons-nous que les animations sont cohérentes entre les différents types de boutons */
+.search-result-favorite.just-added i.fas,
+.app-favorite-toggle.just-clicked i.fas {
+    animation: star-pulse 0.5s ease-out;
+}
+
+/* Effet visuel lorsqu'on survole une étoile déjà active */
+.app-favorite-toggle.is-favorite:hover i.fas,
+.search-result-favorite.is-favorite:hover i.fas {
+    color: #FF8C00; /* Orange plus intense au survol d'une étoile active */
+    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.5)); /* Effet de halo doré */
+}
+
+/* Effet visuel quand on est sur le point de retirer un favori */
+.app-favorite-toggle.is-favorite:active i.fas,
+.search-result-favorite.is-favorite:active i.fas {
+    transform: scale(0.8);
+    transition: transform 0.1s ease;
+    color: #FF6347; /* Couleur rougeâtre indiquant la suppression */
+}
+
 /* Adaptation mobile */
 @media (max-width: 768px) {
     .app-favorite-toggle {
