@@ -250,11 +250,11 @@ class AppController {
      */
     updateDisplay(isInitialLoad = false, preserveScroll = false) {
         // Récupère les informations nécessaires
-        let categories = this.categoryModel.getOrderedCategories();
+        let allCategories = this.categoryModel.getOrderedCategories();
         const currentCategoryId = this.categoryModel.getCurrentCategoryId();
         
         // Filtre les catégories selon leur visibilité
-        const visibleCategories = this.visibilityManager.filterVisibleCategories(categories);
+        const visibleCategories = this.visibilityManager.filterVisibleCategories(allCategories);
         
         // Récupère les favoris groupés
         const favoritesData = this.favoritesModel.getFavoriteApps(this.categoryModel);
@@ -278,15 +278,15 @@ class AppController {
             (appId, categoryId, groupId) => this.addToFavorites(appId, categoryId, groupId)
         );
         
-        // Met à jour le dock avec les catégories pour la navigation rapide
+        // Met à jour le dock avec les catégories visibles pour la navigation rapide
         this.dockManager.updateDockCategories(
-            categories, // Toutes les catégories pour le panneau de configuration
+            visibleCategories, // Utiliser les catégories filtrées au lieu de toutes les catégories
             currentCategoryId, 
             (categoryId) => this.changeCategory(categoryId),
             () => this.visibilityManager.togglePanel()
         );
     }
-    
+
     /**
      * Initialise l'application
      */
