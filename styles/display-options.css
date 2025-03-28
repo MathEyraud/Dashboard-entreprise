@@ -3,8 +3,8 @@
 /* Style de la Carte Flottante */
 .display-options-card {
     position: fixed;
-    right: 5%;
-    bottom: 12%;
+    right: 50px;
+    bottom: 120px;
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: var(--border-radius-md);
@@ -12,6 +12,7 @@
     box-shadow: var(--shadow-md);
     z-index: 50;
     width: 240px;
+    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
 }
 
 .display-options-card-header {
@@ -133,20 +134,34 @@
     background-color: var(--color-button-alt);
 }
 
-/* État fermé de la carte */
+/* État fermé de la carte - Animation harmonisée */
 .display-options-card.closed {
     transform: translateY(20px);
     opacity: 0;
     visibility: hidden;
-    transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
 }
 
-/* État ouvert de la carte */
+/* État ouvert de la carte - Animation harmonisée */
 .display-options-card.open {
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Animation pour l'apparition de la carte */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.display-options-card.open {
+    animation: fadeInUp 0.3s ease forwards;
 }
 
 /* ==== Densité d'affichage ==== */
